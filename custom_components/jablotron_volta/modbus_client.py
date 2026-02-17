@@ -65,10 +65,19 @@ class JablotronModbusClient:
     ) -> list[int] | None:
         """Read input registers (read-only monitoring data)."""
         try:
+            _LOGGER.debug(
+                "Reading input registers: address=%s, count=%s, slave=%s",
+                address,
+                count,
+                self.device_id,
+            )
             result = self._client.read_input_registers(
                 address, count, slave=self.device_id
             )
-            if result.isError():
+            _LOGGER.debug("Read result: %s", result)
+            
+            # Check for errors - pymodbus 3.x compatibility
+            if hasattr(result, 'isError') and result.isError():
                 _LOGGER.error(
                     "Modbus error reading input registers at %s (count %s): %s",
                     address,
@@ -76,12 +85,25 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
+            
+            # Alternative error check for newer pymodbus versions
+            if not hasattr(result, 'registers'):
+                _LOGGER.error(
+                    "Invalid response reading input registers at %s (count %s): %s",
+                    address,
+                    count,
+                    result,
+                )
+                return None
+                
+            _LOGGER.debug("Successfully read %s registers from address %s: %s", 
+                         len(result.registers), address, result.registers)
             return result.registers
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading input registers: %s", err)
             return None
         except Exception as err:
-            _LOGGER.error("Unexpected error reading input registers: %s", err)
+            _LOGGER.exception("Unexpected error reading input registers: %s", err)
             return None
 
     def read_holding_registers(
@@ -89,10 +111,19 @@ class JablotronModbusClient:
     ) -> list[int] | None:
         """Read holding registers (configuration data)."""
         try:
+            _LOGGER.debug(
+                "Reading holding registers: address=%s, count=%s, slave=%s",
+                address,
+                count,
+                self.device_id,
+            )
             result = self._client.read_holding_registers(
                 address, count, slave=self.device_id
             )
-            if result.isError():
+            _LOGGER.debug("Read result: %s", result)
+            
+            # Check for errors - pymodbus 3.x compatibility
+            if hasattr(result, 'isError') and result.isError():
                 _LOGGER.error(
                     "Modbus error reading holding registers at %s (count %s): %s",
                     address,
@@ -100,19 +131,41 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
+            
+            # Alternative error check for newer pymodbus versions
+            if not hasattr(result, 'registers'):
+                _LOGGER.error(
+                    "Invalid response reading holding registers at %s (count %s): %s",
+                    address,
+                    count,
+                    result,
+                )
+                return None
+                
+            _LOGGER.debug("Successfully read %s registers from address %s: %s",
+                         len(result.registers), address, result.registers)
             return result.registers
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading holding registers: %s", err)
             return None
         except Exception as err:
-            _LOGGER.error("Unexpected error reading holding registers: %s", err)
+            _LOGGER.exception("Unexpected error reading holding registers: %s", err)
             return None
 
     def write_register(self, address: int, value: int) -> bool:
         """Write a single register."""
         try:
+            _LOGGER.debug(
+                "Writing register: address=%s, value=%s, slave=%s",
+                address,
+                value,
+                self.device_id,
+            )
             result = self._client.write_register(address, value, slave=self.device_id)
-            if result.isError():
+            _LOGGER.debug("Write result: %s", result)
+            
+            # Check for errors - pymodbus 3.x compatibility
+            if hasattr(result, 'isError') and result.isError():
                 _LOGGER.error(
                     "Modbus error writing register at %s with value %s: %s",
                     address,
@@ -120,13 +173,14 @@ class JablotronModbusClient:
                     result,
                 )
                 return False
+            
             _LOGGER.debug("Successfully wrote %s to register %s", value, address)
             return True
         except ModbusException as err:
             _LOGGER.error("Modbus exception writing register: %s", err)
             return False
         except Exception as err:
-            _LOGGER.error("Unexpected error writing register: %s", err)
+            _LOGGER.exception("Unexpected error writing register: %s", err)
             return False
 
     def read_all_data(self) -> dict[str, Any]:

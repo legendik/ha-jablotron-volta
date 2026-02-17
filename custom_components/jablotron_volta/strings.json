@@ -12,9 +12,9 @@
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to the device",
-      "cannot_read": "Connected but failed to read data from the device",
-      "unknown": "Unexpected error occurred"
+      "cannot_connect": "Failed to connect to the device. Check IP address and port.",
+      "cannot_read": "Connected but failed to read data from the device. Check device ID (slave ID) and ensure Modbus TCP is enabled on the device. See logs for details.",
+      "unknown": "Unexpected error occurred. See logs for details."
     },
     "abort": {
       "already_configured": "Device is already configured"
