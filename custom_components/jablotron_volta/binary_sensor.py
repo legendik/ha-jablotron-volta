@@ -33,21 +33,18 @@ BINARY_SENSOR_TYPES: tuple[JablotronVoltaBinarySensorEntityDescription, ...] = (
     JablotronVoltaBinarySensorEntityDescription(
         key="dhw_heating",
         translation_key="dhw_heating",
-        name="DHW Heating",
         device_class=BinarySensorDeviceClass.HEAT,
         value_fn=lambda data: data.get("dhw_state_heat", False),
     ),
     JablotronVoltaBinarySensorEntityDescription(
         key="ch1_heating",
         translation_key="ch1_heating",
-        name="CH1 Heating",
         device_class=BinarySensorDeviceClass.HEAT,
         value_fn=lambda data: data.get("ch1_state_heat", False),
     ),
     JablotronVoltaBinarySensorEntityDescription(
         key="ch2_heating",
         translation_key="ch2_heating",
-        name="CH2 Heating",
         device_class=BinarySensorDeviceClass.HEAT,
         value_fn=lambda data: data.get("ch2_state_heat", False),
         available_fn=lambda coord: coord.ch2_available,
@@ -55,7 +52,6 @@ BINARY_SENSOR_TYPES: tuple[JablotronVoltaBinarySensorEntityDescription, ...] = (
     JablotronVoltaBinarySensorEntityDescription(
         key="system_alert",
         translation_key="system_alert",
-        name="System Alert",
         device_class=BinarySensorDeviceClass.PROBLEM,
         value_fn=lambda data: data.get("system_attention", 0) != 0,
     ),

@@ -19,12 +19,10 @@ BUTTON_TYPES: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
         key="reset_error",
         translation_key="reset_error",
-        name="Reset Error",
     ),
     ButtonEntityDescription(
         key="restart_device",
         translation_key="restart_device",
-        name="Restart Device",
     ),
 )
 
@@ -55,12 +53,10 @@ class JablotronVoltaButtonBase(CoordinatorEntity, ButtonEntity):
         coordinator: JablotronVoltaCoordinator,
         entry: ConfigEntry,
         key: str,
-        name: str,
     ) -> None:
         """Initialize the button."""
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry.entry_id}_{key}"
-        self._attr_name = name
         self._attr_translation_key = key
         self._attr_device_info = coordinator.device_info
 
@@ -74,7 +70,7 @@ class JablotronVoltaResetErrorButton(JablotronVoltaButtonBase):
         entry: ConfigEntry,
     ) -> None:
         """Initialize the reset error button."""
-        super().__init__(coordinator, entry, "reset_error", "Reset Error")
+        super().__init__(coordinator, entry, "reset_error")
 
     async def async_press(self) -> None:
         """Handle the button press."""
@@ -108,7 +104,7 @@ class JablotronVoltaRestartButton(JablotronVoltaButtonBase):
         entry: ConfigEntry,
     ) -> None:
         """Initialize the restart button."""
-        super().__init__(coordinator, entry, "restart_device", "Restart Device")
+        super().__init__(coordinator, entry, "restart_device")
 
     async def async_press(self) -> None:
         """Handle the button press."""

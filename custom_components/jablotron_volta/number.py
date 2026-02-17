@@ -66,7 +66,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="building_momentum",
         translation_key="building_momentum",
-        name="Building Thermal Momentum",
         native_min_value=0,
         native_max_value=200,
         native_step=1,
@@ -79,7 +78,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="composite_filter_ratio",
         translation_key="composite_filter_ratio",
-        name="Composite Filter Ratio",
         native_min_value=0,
         native_max_value=1,
         native_step=0.1,
@@ -91,7 +89,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="changeover_temp",
         translation_key="changeover_temp",
-        name="Changeover Temperature",
         native_min_value=-20,
         native_max_value=30,
         native_step=0.5,
@@ -104,7 +101,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="outdoor_temp_manual",
         translation_key="outdoor_temp_manual",
-        name="Outdoor Temperature (Manual)",
         native_min_value=-40,
         native_max_value=50,
         native_step=0.5,
@@ -118,7 +114,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="boiler_outdoor_temp_correction",
         translation_key="boiler_outdoor_temp_correction",
-        name="Outdoor Temperature Correction",
         native_min_value=-10,
         native_max_value=10,
         native_step=0.5,
@@ -131,7 +126,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="boiler_water_temp_max",
         translation_key="boiler_water_temp_max",
-        name="Boiler Max Water Temperature",
         native_min_value=30,
         native_max_value=90,
         native_step=1,
@@ -144,7 +138,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="boiler_water_temp_min",
         translation_key="boiler_water_temp_min",
-        name="Boiler Min Water Temperature",
         native_min_value=10,
         native_max_value=60,
         native_step=1,
@@ -158,7 +151,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="dhw_hysteresis",
         translation_key="dhw_hysteresis",
-        name="DHW Hysteresis",
         native_min_value=0.5,
         native_max_value=10,
         native_step=0.5,
@@ -172,7 +164,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_antifrost_temp",
         translation_key="ch1_antifrost_temp",
-        name="CH1 Antifrost Temperature",
         native_min_value=5,
         native_max_value=15,
         native_step=0.5,
@@ -185,7 +176,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_hysteresis",
         translation_key="ch1_hysteresis",
-        name="CH1 Hysteresis",
         native_min_value=0.5,
         native_max_value=5,
         native_step=0.5,
@@ -198,7 +188,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_water_temp_min",
         translation_key="ch1_water_temp_min",
-        name="CH1 Min Water Temperature",
         native_min_value=10,
         native_max_value=50,
         native_step=1,
@@ -211,7 +200,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_water_temp_max",
         translation_key="ch1_water_temp_max",
-        name="CH1 Max Water Temperature",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -224,7 +212,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_equitherm_slope",
         translation_key="ch1_equitherm_slope",
-        name="CH1 Equitherm Slope",
         native_min_value=0,
         native_max_value=10,
         native_step=0.1,
@@ -236,7 +223,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_equitherm_offset",
         translation_key="ch1_equitherm_offset",
-        name="CH1 Equitherm Offset",
         native_min_value=-20,
         native_max_value=20,
         native_step=0.5,
@@ -249,7 +235,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_equitherm_room_effect",
         translation_key="ch1_equitherm_room_effect",
-        name="CH1 Equitherm Room Effect",
         native_min_value=0,
         native_max_value=100,
         native_step=5,
@@ -262,7 +247,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_threshold_setpoint",
         translation_key="ch1_threshold_setpoint",
-        name="CH1 Threshold Setpoint",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -275,7 +259,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_limit_heat_temp",
         translation_key="ch1_limit_heat_temp",
-        name="CH1 Heat Limit Temperature",
         native_min_value=0,
         native_max_value=10,
         native_step=0.5,
@@ -288,7 +271,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_temp_correction",
         translation_key="ch1_temp_correction",
-        name="CH1 Temperature Correction",
         native_min_value=-5,
         native_max_value=5,
         native_step=0.5,
@@ -301,7 +283,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch1_humidity_correction",
         translation_key="ch1_humidity_correction",
-        name="CH1 Humidity Correction",
         native_min_value=-20,
         native_max_value=20,
         native_step=1,
@@ -315,7 +296,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_antifrost_temp",
         translation_key="ch2_antifrost_temp",
-        name="CH2 Antifrost Temperature",
         native_min_value=5,
         native_max_value=15,
         native_step=0.5,
@@ -329,7 +309,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_hysteresis",
         translation_key="ch2_hysteresis",
-        name="CH2 Hysteresis",
         native_min_value=0.5,
         native_max_value=5,
         native_step=0.5,
@@ -343,7 +322,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_min",
         translation_key="ch2_water_temp_min",
-        name="CH2 Min Water Temperature",
         native_min_value=10,
         native_max_value=50,
         native_step=1,
@@ -357,7 +335,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_max",
         translation_key="ch2_water_temp_max",
-        name="CH2 Max Water Temperature",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -371,7 +348,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_slope",
         translation_key="ch2_equitherm_slope",
-        name="CH2 Equitherm Slope",
         native_min_value=0,
         native_max_value=10,
         native_step=0.1,
@@ -384,7 +360,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_offset",
         translation_key="ch2_equitherm_offset",
-        name="CH2 Equitherm Offset",
         native_min_value=-20,
         native_max_value=20,
         native_step=0.5,
@@ -398,7 +373,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_room_effect",
         translation_key="ch2_equitherm_room_effect",
-        name="CH2 Equitherm Room Effect",
         native_min_value=0,
         native_max_value=100,
         native_step=5,
@@ -412,7 +386,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_threshold_setpoint",
         translation_key="ch2_threshold_setpoint",
-        name="CH2 Threshold Setpoint",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -426,7 +399,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_limit_heat_temp",
         translation_key="ch2_limit_heat_temp",
-        name="CH2 Heat Limit Temperature",
         native_min_value=0,
         native_max_value=10,
         native_step=0.5,
@@ -440,7 +412,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_temp_correction",
         translation_key="ch2_temp_correction",
-        name="CH2 Temperature Correction",
         native_min_value=-5,
         native_max_value=5,
         native_step=0.5,
@@ -454,7 +425,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     JablotronVoltaNumberEntityDescription(
         key="ch2_humidity_correction",
         translation_key="ch2_humidity_correction",
-        name="CH2 Humidity Correction",
         native_min_value=-20,
         native_max_value=20,
         native_step=1,

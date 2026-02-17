@@ -37,21 +37,18 @@ SWITCH_TYPES: tuple[JablotronVoltaSwitchEntityDescription, ...] = (
     JablotronVoltaSwitchEntityDescription(
         key="ch1_optimal_start",
         translation_key="ch1_optimal_start",
-        name="CH1 Optimal Start/Stop",
         register=REG_CH1_OPTIMAL_ON_OFF_ENABLE,
         value_fn=lambda data: data.get("ch1_optimal_start", False),
     ),
     JablotronVoltaSwitchEntityDescription(
         key="ch1_fast_cooldown",
         translation_key="ch1_fast_cooldown",
-        name="CH1 Fast Cooldown",
         register=REG_CH1_FAST_COOLDOWN,
         value_fn=lambda data: data.get("ch1_fast_cooldown", False),
     ),
     JablotronVoltaSwitchEntityDescription(
         key="ch2_optimal_start",
         translation_key="ch2_optimal_start",
-        name="CH2 Optimal Start/Stop",
         register=REG_CH2_OPTIMAL_ON_OFF_ENABLE,
         value_fn=lambda data: data.get("ch2_optimal_start", False),
         available_fn=lambda coord: coord.ch2_available,
@@ -59,7 +56,6 @@ SWITCH_TYPES: tuple[JablotronVoltaSwitchEntityDescription, ...] = (
     JablotronVoltaSwitchEntityDescription(
         key="ch2_fast_cooldown",
         translation_key="ch2_fast_cooldown",
-        name="CH2 Fast Cooldown",
         register=REG_CH2_FAST_COOLDOWN,
         value_fn=lambda data: data.get("ch2_fast_cooldown", False),
         available_fn=lambda coord: coord.ch2_available,

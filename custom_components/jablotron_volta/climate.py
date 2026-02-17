@@ -85,7 +85,6 @@ class JablotronVoltaDHWClimate(JablotronVoltaClimateBase):
         """Initialize DHW climate entity."""
         super().__init__(coordinator, entry)
         self._attr_unique_id = f"{entry.entry_id}_dhw_climate"
-        self._attr_name = "Hot Water"
         self._attr_translation_key = "dhw"
 
     @property
@@ -184,7 +183,6 @@ class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
         super().__init__(coordinator, entry)
         self._circuit = circuit_number
         self._attr_unique_id = f"{entry.entry_id}_ch{circuit_number}_climate"
-        self._attr_name = f"Heating Circuit {circuit_number}"
         self._attr_translation_key = f"ch{circuit_number}"
 
     @property

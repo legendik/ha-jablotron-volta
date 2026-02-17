@@ -46,7 +46,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="regulation_mode",
         translation_key="regulation_mode",
-        name="Regulation Mode",
         options_map=REGU_MODE_MAP,
         register=REG_REGU_MODE_USER,
         value_fn=lambda data: data.get("regulation_mode_user"),
@@ -54,7 +53,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="outdoor_temp_source",
         translation_key="outdoor_temp_source",
-        name="Outdoor Temperature Source",
         options_map=OUT_TEMP_SOURCE_MAP,
         register=REG_REGU_SOURCE_OUT_TEMPER,
         value_fn=lambda data: data.get("outdoor_temp_source"),
@@ -62,7 +60,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="dhw_regulation_strategy",
         translation_key="dhw_regulation_strategy",
-        name="DHW Regulation Strategy",
         options_map={0: "strategy_0", 1: "strategy_1", 2: "strategy_2"},
         register=REG_DHW_REGULATION_STRAT,
         value_fn=lambda data: data.get("dhw_regulation_strategy"),
@@ -70,7 +67,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="ch1_regulation_strategy",
         translation_key="ch1_regulation_strategy",
-        name="CH1 Regulation Strategy",
         options_map=REGULATION_STRAT_MAP,
         register=REG_CH1_REGULATION_STRAT,
         value_fn=lambda data: data.get("ch1_regulation_strategy"),
@@ -78,7 +74,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="ch2_regulation_strategy",
         translation_key="ch2_regulation_strategy",
-        name="CH2 Regulation Strategy",
         options_map=REGULATION_STRAT_MAP,
         register=REG_CH2_REGULATION_STRAT,
         value_fn=lambda data: data.get("ch2_regulation_strategy"),
@@ -87,7 +82,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="control_mode",
         translation_key="control_mode",
-        name="Control Mode",
         options_map=CONTROL_MODE_MAP,
         register=REG_SYS_CONTROL,
         value_fn=lambda data: data.get("control_mode"),
@@ -95,7 +89,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="master_fail_mode",
         translation_key="master_fail_mode",
-        name="Master Fail Mode",
         options_map=MASTER_FAIL_MAP,
         register=REG_SYS_MASTER_FAIL,
         value_fn=lambda data: data.get("master_fail_mode"),
