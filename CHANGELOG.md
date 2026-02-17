@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.0...jablotron-volta-v1.1.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* calls to writing register must be authenticated first ([2e73ec5](https://github.com/legendik/ha-jablotron-volta/commit/2e73ec59dbbae739109c3e5f6008555250cf27f6))
+
 ## [1.1.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.0.0...jablotron-volta-v1.1.0) (2026-02-17)
 
 
