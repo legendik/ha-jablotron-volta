@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.5...jablotron-volta-v1.1.6) (2026-02-17)
+
+
+### Bug Fixes
+
+* use signed conversion for outdoor temperatures ([42f1294](https://github.com/legendik/ha-jablotron-volta/commit/42f12946e7fb17373cce666b7040c92c7af7a31f))
+
 ## [1.1.5](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.4...jablotron-volta-v1.1.5) (2026-02-17)
 
 
