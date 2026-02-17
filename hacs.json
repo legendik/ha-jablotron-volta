@@ -1,5 +1,7 @@
 {
   "name": "Jablotron Volta",
-  "homeassistant": "2025.9.0",
-  "render_readme": true
+  "hacs": "1.6.0",
+  "domains": ["climate", "sensor", "binary_sensor", "select", "number", "switch", "button"],
+  "iot_class": "Local Polling",
+  "homeassistant": "2024.1.0"
 }
