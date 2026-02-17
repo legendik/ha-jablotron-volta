@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.0...jablotron-volta-v1.3.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* update climate entity to use jablotron_volta prefix ([06a9bd9](https://github.com/legendik/ha-jablotron-volta/commit/06a9bd9e01356ce596e07a23c62c8d14614b2efb))
+* update water temperature entity names in dashboard ([ec76fd8](https://github.com/legendik/ha-jablotron-volta/commit/ec76fd8b877acf1cc04ff11d2f22c0a41ab8dcd7))
+* use English entity names in translations to fix entity ID generation ([09c4613](https://github.com/legendik/ha-jablotron-volta/commit/09c4613c0eb66d6d971d6f12b8ec371e667d85b5))
+
 ## [1.3.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.2.1...jablotron-volta-v1.3.0) (2026-02-17)
 
 
