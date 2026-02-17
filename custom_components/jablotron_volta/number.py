@@ -99,7 +99,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_REGU_TEMPER_CHANGEOVER,
         value_fn=lambda data: data.get("changeover_temp"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     JablotronVoltaNumberEntityDescription(
         key="outdoor_temp_manual",
@@ -112,7 +112,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_REGU_TEMPER_OUTSIDE,
         value_fn=lambda data: data.get("outdoor_temp_manual"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     # Boiler Settings
     JablotronVoltaNumberEntityDescription(
@@ -126,7 +126,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_ELE_CORR_TEMP_OUTSIDE,
         value_fn=lambda data: data.get("boiler_outdoor_temp_correction"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     JablotronVoltaNumberEntityDescription(
         key="boiler_water_temp_max",
@@ -231,7 +231,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH1_EQUITHERM_SLOPE,
         value_fn=lambda data: data.get("ch1_equitherm_slope"),
-        scale_fn=lambda x: int(x),
+        scale_fn=lambda x: int(x * 10),
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_equitherm_offset",
@@ -244,7 +244,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH1_EQUITHERM_OFFSET,
         value_fn=lambda data: data.get("ch1_equitherm_offset"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_equitherm_room_effect",
@@ -296,7 +296,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH1_UI_SENSOR_CORR_TEMP_78,
         value_fn=lambda data: data.get("ch1_temp_correction"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_humidity_correction",
@@ -309,7 +309,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH1_UI_SENSOR_CORR_HUMI_79,
         value_fn=lambda data: data.get("ch1_humidity_correction"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
     ),
     # CH2 Settings (conditional)
     JablotronVoltaNumberEntityDescription(
@@ -378,7 +378,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH2_EQUITHERM_SLOPE,
         value_fn=lambda data: data.get("ch2_equitherm_slope"),
-        scale_fn=lambda x: int(x),
+        scale_fn=lambda x: int(x * 10),
         available_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
@@ -392,7 +392,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH2_EQUITHERM_OFFSET,
         value_fn=lambda data: data.get("ch2_equitherm_offset"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
         available_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
@@ -448,7 +448,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH2_UI_SENSOR_CORR_TEMP_78,
         value_fn=lambda data: data.get("ch2_temp_correction"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
         available_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
@@ -462,7 +462,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_CH2_UI_SENSOR_CORR_HUMI_79,
         value_fn=lambda data: data.get("ch2_humidity_correction"),
-        scale_fn=lambda x: int(x * 10),
+        scale_fn=lambda x: int(x * 10) if x >= 0 else int(x * 10) + 65536,
         available_fn=lambda coord: coord.ch2_available,
     ),
 )

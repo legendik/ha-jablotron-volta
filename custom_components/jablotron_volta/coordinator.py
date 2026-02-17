@@ -184,7 +184,7 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["ch1_temperature_current"] = self.client.scale_temperature(ch1[1])
                 data["ch1_water_input_temp"] = self.client.scale_temperature(ch1[2])
                 data["ch1_water_return_temp"] = self.client.scale_temperature(ch1[3])
-                data["ch1_pump_power"] = ch1[4]
+                data["ch1_pump_power"] = self.client.scale_percentage(ch1[4])
                 data["ch1_humidity"] = self.client.scale_percentage(ch1[5])
                 data["ch1_co2"] = self.client.scale_percentage(ch1[6])
 
@@ -196,7 +196,7 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["ch2_temperature_current"] = self.client.scale_temperature(ch2[1])
                 data["ch2_water_input_temp"] = self.client.scale_temperature(ch2[2])
                 data["ch2_water_return_temp"] = self.client.scale_temperature(ch2[3])
-                data["ch2_pump_power"] = ch2[4]
+                data["ch2_pump_power"] = self.client.scale_percentage(ch2[4])
                 data["ch2_humidity"] = self.client.scale_percentage(ch2[5])
                 data["ch2_co2"] = self.client.scale_percentage(ch2[6])
 
@@ -216,8 +216,8 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["outdoor_temp_source"] = reg_set[1]
                 data["building_momentum"] = reg_set[2]
                 data["composite_filter_ratio"] = self.client.scale_ratio(reg_set[3])
-                data["changeover_temp"] = self.client.scale_temperature(reg_set[4])
-                data["outdoor_temp_manual"] = self.client.scale_temperature(reg_set[5])
+                data["changeover_temp"] = self.client.scale_signed_temperature(reg_set[4])
+                data["outdoor_temp_manual"] = self.client.scale_signed_temperature(reg_set[5])
 
         # Process boiler settings
         if "boiler_settings" in raw_data:
@@ -226,7 +226,7 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["boiler_load_release"] = boiler_set[0]
                 data["boiler_hdo_high_tariff"] = boiler_set[1]
                 data["boiler_outdoor_temp_correction"] = (
-                    self.client.scale_temperature(boiler_set[2])
+                    self.client.scale_signed_temperature(boiler_set[2])
                 )
                 data["boiler_total_energy"] = boiler_set[3]
                 data["boiler_water_setpoint"] = self.client.scale_temperature(
@@ -276,8 +276,8 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["ch1_water_temp_min"] = self.client.scale_temperature(ch1_set[8])
                 data["ch1_water_temp_max"] = self.client.scale_temperature(ch1_set[9])
                 data["ch1_water_setpoint"] = self.client.scale_temperature(ch1_set[10])
-                data["ch1_equitherm_slope"] = ch1_set[11]
-                data["ch1_equitherm_offset"] = self.client.scale_temperature(
+                data["ch1_equitherm_slope"] = self.client.scale_ratio(ch1_set[11])
+                data["ch1_equitherm_offset"] = self.client.scale_signed_temperature(
                     ch1_set[12]
                 )
                 data["ch1_equitherm_room_effect"] = ch1_set[13]
@@ -289,10 +289,10 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 )
                 data["ch1_optimal_start"] = bool(ch1_set[16])
                 data["ch1_fast_cooldown"] = bool(ch1_set[17])
-                data["ch1_temp_correction"] = self.client.scale_temperature(
+                data["ch1_temp_correction"] = self.client.scale_signed_temperature(
                     ch1_set[18]
                 )
-                data["ch1_humidity_correction"] = self.client.scale_percentage(
+                data["ch1_humidity_correction"] = self.client.scale_signed_percentage(
                     ch1_set[19]
                 )
 
@@ -317,8 +317,8 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 data["ch2_water_temp_min"] = self.client.scale_temperature(ch2_set[8])
                 data["ch2_water_temp_max"] = self.client.scale_temperature(ch2_set[9])
                 data["ch2_water_setpoint"] = self.client.scale_temperature(ch2_set[10])
-                data["ch2_equitherm_slope"] = ch2_set[11]
-                data["ch2_equitherm_offset"] = self.client.scale_temperature(
+                data["ch2_equitherm_slope"] = self.client.scale_ratio(ch2_set[11])
+                data["ch2_equitherm_offset"] = self.client.scale_signed_temperature(
                     ch2_set[12]
                 )
                 data["ch2_equitherm_room_effect"] = ch2_set[13]
@@ -330,10 +330,10 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
                 )
                 data["ch2_optimal_start"] = bool(ch2_set[16])
                 data["ch2_fast_cooldown"] = bool(ch2_set[17])
-                data["ch2_temp_correction"] = self.client.scale_temperature(
+                data["ch2_temp_correction"] = self.client.scale_signed_temperature(
                     ch2_set[18]
                 )
-                data["ch2_humidity_correction"] = self.client.scale_percentage(
+                data["ch2_humidity_correction"] = self.client.scale_signed_percentage(
                     ch2_set[19]
                 )
 

@@ -310,6 +310,18 @@ class JablotronModbusClient:
     def scale_temperature(value: int) -> float:
         """Scale temperature value (0.1°C resolution)."""
         return value / 10.0
+    
+    @staticmethod
+    def scale_signed_temperature(value: int) -> float:
+        """Scale signed temperature value (0.1°C resolution).
+        
+        Converts unsigned int16 to signed int16 first, then scales.
+        Example: 65516 (0xFFEC) -> -20 -> -2.0°C
+        """
+        # Convert unsigned int16 to signed int16
+        if value > 32767:
+            value = value - 65536
+        return value / 10.0
 
     @staticmethod
     def scale_voltage(value: int) -> float:
@@ -325,6 +337,17 @@ class JablotronModbusClient:
     def scale_percentage(value: int) -> float:
         """Scale percentage value (0.1% resolution)."""
         return value / 10.0
+    
+    @staticmethod
+    def scale_signed_percentage(value: int) -> float:
+        """Scale signed percentage value (0.1% resolution).
+        
+        Converts unsigned int16 to signed int16 first, then scales.
+        """
+        # Convert unsigned int16 to signed int16
+        if value > 32767:
+            value = value - 65536
+        return value / 10.0
 
     @staticmethod
     def scale_ratio(value: int) -> float:
@@ -335,6 +358,19 @@ class JablotronModbusClient:
     def unscale_temperature(value: float) -> int:
         """Unscale temperature value for writing."""
         return int(value * 10)
+    
+    @staticmethod
+    def unscale_signed_temperature(value: float) -> int:
+        """Unscale signed temperature value for writing.
+        
+        Scales value and converts signed int16 to unsigned int16.
+        Example: -2.0°C -> -20 -> 65516 (0xFFEC)
+        """
+        scaled = int(value * 10)
+        # Convert signed int16 to unsigned int16
+        if scaled < 0:
+            scaled = scaled + 65536
+        return scaled
 
     @staticmethod
     def unscale_voltage(value: float) -> int:
