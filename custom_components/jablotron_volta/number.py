@@ -491,6 +491,7 @@ class JablotronVoltaNumber(CoordinatorEntity, NumberEntity):
     """Representation of a Jablotron Volta number entity."""
 
     entity_description: JablotronVoltaNumberEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,

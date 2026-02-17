@@ -48,6 +48,8 @@ async def async_setup_entry(
 class JablotronVoltaButtonBase(CoordinatorEntity, ButtonEntity):
     """Base class for Jablotron Volta buttons."""
 
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         coordinator: JablotronVoltaCoordinator,

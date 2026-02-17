@@ -126,6 +126,7 @@ class JablotronVoltaSelect(CoordinatorEntity, SelectEntity):
     """Representation of a Jablotron Volta select entity."""
 
     entity_description: JablotronVoltaSelectEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,

@@ -60,6 +60,7 @@ class JablotronVoltaClimateBase(CoordinatorEntity, ClimateEntity):
 
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+    _attr_has_entity_name = True
 
     def __init__(
         self,

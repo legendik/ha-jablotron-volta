@@ -90,6 +90,7 @@ class JablotronVoltaSwitch(CoordinatorEntity, SwitchEntity):
     """Representation of a Jablotron Volta switch."""
 
     entity_description: JablotronVoltaSwitchEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,

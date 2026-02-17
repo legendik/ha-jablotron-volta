@@ -80,6 +80,35 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         value_fn=lambda data: data.get("outdoor_temp_composite"),
     ),
+    # Room Temperatures (from thermostats)
+    JablotronVoltaSensorEntityDescription(
+        key="ch1_temperature_current",
+        translation_key="ch1_temperature_current",
+        name="CH1 Current Room Temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        value_fn=lambda data: data.get("ch1_temperature_current"),
+    ),
+    JablotronVoltaSensorEntityDescription(
+        key="ch2_temperature_current",
+        translation_key="ch2_temperature_current",
+        name="CH2 Current Room Temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        value_fn=lambda data: data.get("ch2_temperature_current"),
+        available_fn=lambda coord: coord.ch2_available,
+    ),
+    JablotronVoltaSensorEntityDescription(
+        key="dhw_temperature_current",
+        translation_key="dhw_temperature_current",
+        name="DHW Current Temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        value_fn=lambda data: data.get("dhw_temperature_current"),
+    ),
     # Boiler Water Temperatures
     JablotronVoltaSensorEntityDescription(
         key="boiler_water_input_temp",
@@ -326,6 +355,7 @@ class JablotronVoltaSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Jablotron Volta sensor."""
 
     entity_description: JablotronVoltaSensorEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,

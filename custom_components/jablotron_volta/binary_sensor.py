@@ -85,6 +85,7 @@ class JablotronVoltaBinarySensor(CoordinatorEntity, BinarySensorEntity):
     """Representation of a Jablotron Volta binary sensor."""
 
     entity_description: JablotronVoltaBinarySensorEntityDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,
