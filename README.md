@@ -85,6 +85,33 @@ The integration will:
 - Automatically detect available heating circuits (CH2 created only if detected)
 - Create all relevant entities
 
+## Dashboard
+
+A professional dashboard with 7 tabs for complete control is included!
+
+📊 **Features:**
+- Thermostat card for quick control
+- Equitherm curve visualization with real-time data
+- Temperature and pressure gauges
+- History graphs (24h/48h)
+- Recommended settings for floor heating
+- Optimization tips
+- Complete diagnostics
+
+📁 **Files:**
+- `dashboard_jablotron_volta.yaml` - Complete dashboard configuration
+- `DASHBOARD_README.md` - Detailed installation and usage guide
+- `DASHBOARD_QUICK_START.txt` - Quick reference guide
+
+🚀 **Quick Install:**
+1. Settings → Dashboards → + Add Dashboard
+2. Name: "Jablotron Volta"
+3. Edit → ⋮ → Raw configuration editor
+4. Copy content from `dashboard_jablotron_volta.yaml`
+5. Save & Done! 🎉
+
+See [DASHBOARD_README.md](DASHBOARD_README.md) for detailed instructions.
+
 ## Entities
 
 ### Climate Entities

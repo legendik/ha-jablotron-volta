@@ -1,0 +1,627 @@
+# Jablotron Volta Dashboard
+# Pro použití v Home Assistantu - Settings > Dashboards > Add Dashboard (YAML)
+# Nebo zkopíruj tento YAML do existujícího dashboardu
+
+title: Jablotron Volta
+views:
+  # ============================================================================
+  # TAB 1: PŘEHLED
+  # ============================================================================
+  - title: Přehled
+    path: prehled
+    icon: mdi:home-thermometer
+    cards:
+      # Climate Control
+      - type: thermostat
+        entity: climate.jablotron_volta
+        name: Kotel Volta
+
+      # Hlavní teploty
+      - type: entities
+        title: 🌡️ Teploty
+        show_header_toggle: false
+        entities:
+          - entity: sensor.outdoor_temp_composite
+            name: Venkovní teplota (Composite)
+            icon: mdi:thermometer
+          - entity: sensor.outdoor_temp_damped
+            name: Venkovní teplota (Tlumená)
+            icon: mdi:thermometer-lines
+          - entity: sensor.boiler_water_input_temp
+            name: Teplota vody - vstup
+            icon: mdi:water-thermometer
+          - entity: sensor.boiler_water_return_temp
+            name: Teplota vody - vratná
+            icon: mdi:water-thermometer-outline
+          - type: divider
+          - entity: sensor.ch1_water_setpoint
+            name: CH1 - Požadovaná teplota vody
+            icon: mdi:target
+          - entity: sensor.ch1_temperature_current
+            name: CH1 - Aktuální teplota
+            icon: mdi:thermometer
+
+      # Stav kotle
+      - type: entities
+        title: ⚙️ Stav kotle
+        show_header_toggle: false
+        entities:
+          - entity: select.regulation_mode
+            name: Režim regulace
+            icon: mdi:cog
+          - entity: sensor.boiler_active_segments
+            name: Aktivní topné segmenty
+            icon: mdi:heating-coil
+          - entity: sensor.boiler_pressure
+            name: Tlak v systému
+            icon: mdi:gauge
+          - entity: sensor.cpu_temperature
+            name: Teplota CPU
+            icon: mdi:chip
+
+      # Grafy teplot
+      - type: history-graph
+        title: 📈 Historie teplot (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.outdoor_temp_composite
+            name: Venkovní (Composite)
+          - entity: sensor.boiler_water_input_temp
+            name: Voda - vstup
+          - entity: sensor.ch1_water_setpoint
+            name: CH1 Setpoint
+
+  # ============================================================================
+  # TAB 2: EKVITERMNÍ REGULACE
+  # ============================================================================
+  - title: Ekvitermní křivka
+    path: ekviterm
+    icon: mdi:chart-bell-curve
+    cards:
+      # Aktuální nastavení
+      - type: markdown
+        content: |
+          ## 📊 Ekvitermní regulace
+          
+          **Jak to funguje:**
+          - Kotel mění teplotu vody podle venkovní teploty
+          - **Slope** = Jak moc se mění (sklon křivky)
+          - **Offset** = Posun celé křivky nahoru/dolů
+          - **Composite Ratio** = Mix aktuální + tlumené teploty (0.5 = 50/50)
+          
+          **Tvoje nastavení je optimalizované pro podlahové topení!**
+
+      # Hlavní parametry ekvitermu
+      - type: entities
+        title: ⚙️ Nastavení ekvitermní křivky
+        show_header_toggle: false
+        entities:
+          - entity: number.ch1_equitherm_slope
+            name: Sklon křivky (Slope)
+            icon: mdi:angle-acute
+          - entity: number.ch1_equitherm_offset
+            name: Posun křivky (Offset)
+            icon: mdi:arrow-up-down
+          - entity: number.composite_filter_ratio
+            name: Composite Filter Ratio
+            icon: mdi:filter
+
+      # Venkovní teploty
+      - type: entities
+        title: 🌡️ Venkovní teploty
+        show_header_toggle: false
+        entities:
+          - entity: sensor.outdoor_temp_composite
+            name: Composite (použito pro ekviterm)
+            icon: mdi:thermometer
+          - entity: sensor.outdoor_temp_damped
+            name: Tlumená
+            icon: mdi:thermometer-lines
+          - type: divider
+          - entity: number.building_momentum
+            name: Konstanta setrvačnosti budovy
+            icon: mdi:timer-sand
+
+      # Výsledek - teplota vody
+      - type: gauge
+        entity: sensor.ch1_water_setpoint
+        name: Výsledná teplota vody (CH1)
+        min: 20
+        max: 60
+        severity:
+          green: 30
+          yellow: 45
+          red: 55
+        needle: true
+
+      # Graf - ekvitermní křivka v akci
+      - type: history-graph
+        title: 📈 Ekvitermní regulace (48h)
+        hours_to_show: 48
+        refresh_interval: 300
+        entities:
+          - entity: sensor.outdoor_temp_composite
+            name: Venkovní (Composite)
+          - entity: sensor.ch1_water_setpoint
+            name: Teplota vody
+          - entity: sensor.ch1_water_input_temp
+            name: Voda vstup (skutečná)
+
+      # Doporučení
+      - type: markdown
+        content: |
+          ### 💡 Tipy pro doladění:
+          
+          **Je v zimě zima?**
+          - ❄️ Termostaty pořád otevřené, teplota nikdy nedosáhne cíle
+          - 🔧 **Zvyš Slope** na 0.7 nebo 0.8
+          
+          **Je v přechodném období teplo?**
+          - 🌤️ Termostaty pořád zavřené, přehřívání
+          - 🔧 **Sniž Slope** na 0.5 nebo 0.4
+          
+          **Celkově moc/málo topí?**
+          - 🔧 Uprav **Offset** (±5°C)
+
+  # ============================================================================
+  # TAB 3: CH1 TOPNÝ OKRUH
+  # ============================================================================
+  - title: CH1 Topný okruh
+    path: ch1
+    icon: mdi:radiator
+    cards:
+      # Hlavní info
+      - type: markdown
+        content: |
+          ## 🔥 CH1 - Topný okruh 1
+          
+          **Režim:** Ekvitermní regulace  
+          **Typ topení:** Podlahové topení  
+          **Regulace místností:** Chytré termostaty na hlavicích
+
+      # Aktuální stav
+      - type: entities
+        title: 📊 Aktuální stav
+        show_header_toggle: false
+        entities:
+          - entity: sensor.ch1_temperature_current
+            name: Aktuální teplota
+            icon: mdi:thermometer
+          - entity: sensor.ch1_water_setpoint
+            name: Požadovaná teplota vody
+            icon: mdi:target
+          - entity: sensor.ch1_water_input_temp
+            name: Teplota vody - vstup
+            icon: mdi:water-thermometer
+          - entity: sensor.ch1_water_return_temp
+            name: Teplota vody - vratná
+            icon: mdi:water-thermometer-outline
+
+      # Nastavení teplot
+      - type: entities
+        title: 🎯 Nastavení teplot
+        show_header_toggle: false
+        entities:
+          - entity: number.ch1_temperature_desired
+            name: Požadovaná teplota místnosti
+            icon: mdi:home-thermometer
+          - entity: number.ch1_water_temp_min
+            name: Min. teplota vody
+            icon: mdi:thermometer-chevron-down
+          - entity: number.ch1_water_temp_max
+            name: Max. teplota vody
+            icon: mdi:thermometer-chevron-up
+          - entity: number.ch1_temperature_antifrost
+            name: Protimrazová teplota
+            icon: mdi:snowflake-alert
+
+      # Ekvitermní parametry
+      - type: entities
+        title: 📈 Ekvitermní parametry
+        show_header_toggle: false
+        entities:
+          - entity: number.ch1_equitherm_slope
+            name: Sklon křivky (Slope)
+            icon: mdi:angle-acute
+          - entity: number.ch1_equitherm_offset
+            name: Posun křivky (Offset)
+            icon: mdi:arrow-up-down
+          - entity: number.ch1_equitherm_room_effect
+            name: Vliv prostoru (Room Effect)
+            icon: mdi:home-variant
+
+      # Pokročilé funkce
+      - type: entities
+        title: ⚙️ Pokročilé funkce
+        show_header_toggle: false
+        entities:
+          - entity: switch.ch1_optimal_start
+            name: Optimal Start/Stop
+            icon: mdi:clock-start
+          - entity: number.ch1_hysteresis
+            name: Hysteresis
+            icon: mdi:sine-wave
+          - entity: number.ch1_temp_correction
+            name: Korekce teploty termostatu
+            icon: mdi:thermometer-plus
+
+      # Graf
+      - type: history-graph
+        title: 📈 Historie CH1 (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.ch1_water_setpoint
+            name: Setpoint
+          - entity: sensor.ch1_water_input_temp
+            name: Vstup
+          - entity: sensor.ch1_water_return_temp
+            name: Vratná
+
+      # Doporučení pro tvoje nastavení
+      - type: markdown
+        content: |
+          ### ✅ Doporučené nastavení (tvůj systém):
+          
+          ```yaml
+          Equitherm Slope:        0.6      ✅ Dobře
+          Equitherm Offset:       0°C      ✅ Dobře
+          Room Effect:            0%       ✅ DOPORUČENO (máš chytré termostaty)
+          Temperature Correction: 0°C      ✅ Správně (topíš ekvitermem)
+          Optimal Start/Stop:     OFF      ✅ VYPNI (termostaty to dělají)
+          Hysteresis:             2-3°C    ⚠️ Zvyš (teď 0.5°C je moc málo)
+          ```
+
+  # ============================================================================
+  # TAB 4: SYSTÉM & ÚDRŽBA
+  # ============================================================================
+  - title: Systém
+    path: system
+    icon: mdi:cog
+    cards:
+      # Režim kotle
+      - type: entities
+        title: 🎛️ Režim kotle
+        show_header_toggle: false
+        entities:
+          - entity: select.regulation_mode
+            name: Režim regulace
+            icon: mdi:cog
+          - entity: binary_sensor.heating_active
+            name: Vytápění aktivní
+            icon: mdi:fire
+
+      # Systémové informace
+      - type: entities
+        title: 📟 Systémové informace
+        show_header_toggle: false
+        entities:
+          - entity: sensor.cpu_temperature
+            name: Teplota CPU
+            icon: mdi:chip
+          - entity: sensor.battery_voltage
+            name: Napětí baterie
+            icon: mdi:battery
+          - entity: sensor.boiler_pressure
+            name: Tlak v systému
+            icon: mdi:gauge
+
+      # Topné segmenty
+      - type: entities
+        title: 🔥 Topné segmenty
+        show_header_toggle: false
+        entities:
+          - entity: sensor.boiler_active_segments
+            name: Aktivní segmenty
+            icon: mdi:heating-coil
+          - entity: sensor.boiler_inactive_segments
+            name: Neaktivní segmenty
+            icon: mdi:radiator-disabled
+
+      # Nastavení kotle
+      - type: entities
+        title: ⚙️ Nastavení kotle
+        show_header_toggle: false
+        entities:
+          - entity: number.boiler_water_setpoint
+            name: Požadovaná teplota vody
+            icon: mdi:water-thermometer
+          - entity: number.boiler_water_temp_max
+            name: Max. teplota vody
+            icon: mdi:thermometer-chevron-up
+          - entity: number.boiler_water_temp_min
+            name: Min. teplota vody
+            icon: mdi:thermometer-chevron-down
+
+      # Síťové nastavení (read-only display)
+      - type: entities
+        title: 🌐 Síť
+        show_header_toggle: false
+        state_color: false
+        entities:
+          - entity: sensor.ip_address
+            name: IP adresa
+            icon: mdi:ip-network
+
+      # Teploty kotle
+      - type: glance
+        title: 🌡️ Teploty kotle
+        show_name: true
+        show_state: true
+        columns: 2
+        entities:
+          - entity: sensor.boiler_water_input_temp
+            name: Vstup
+          - entity: sensor.boiler_water_return_temp
+            name: Vratná
+          - entity: sensor.boiler_water_setpoint
+            name: Setpoint
+          - entity: sensor.cpu_temperature
+            name: CPU
+
+      # Tlak - gauge
+      - type: gauge
+        entity: sensor.boiler_pressure
+        name: Tlak v systému
+        min: 0
+        max: 3
+        severity:
+          green: 1
+          yellow: 0.5
+          red: 2.5
+        needle: true
+        unit: bar
+
+  # ============================================================================
+  # TAB 5: TUV (Teplá užitková voda)
+  # ============================================================================
+  - title: TUV
+    path: tuv
+    icon: mdi:water-boiler
+    cards:
+      # Info
+      - type: markdown
+        content: |
+          ## 🚿 TUV - Teplá užitková voda (DHW)
+
+      # Aktuální stav
+      - type: entities
+        title: 📊 Aktuální stav
+        show_header_toggle: false
+        entities:
+          - entity: sensor.dhw_temperature_current
+            name: Aktuální teplota TUV
+            icon: mdi:thermometer
+
+      # Nastavení
+      - type: entities
+        title: 🎯 Nastavení TUV
+        show_header_toggle: false
+        entities:
+          - entity: number.dhw_temperature_desired
+            name: Požadovaná teplota
+            icon: mdi:thermometer
+          - entity: number.dhw_temperature_min
+            name: Min. teplota
+            icon: mdi:thermometer-chevron-down
+          - entity: number.dhw_temperature_max
+            name: Max. teplota
+            icon: mdi:thermometer-chevron-up
+          - entity: number.dhw_hysteresis
+            name: Hysteresis
+            icon: mdi:sine-wave
+
+      # Graf
+      - type: history-graph
+        title: 📈 Historie TUV (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.dhw_temperature_current
+            name: Teplota TUV
+
+      # Gauge
+      - type: gauge
+        entity: sensor.dhw_temperature_current
+        name: Teplota TUV
+        min: 0
+        max: 80
+        severity:
+          green: 45
+          yellow: 35
+          red: 70
+        needle: true
+
+  # ============================================================================
+  # TAB 6: VŠECHNA NASTAVENÍ
+  # ============================================================================
+  - title: Všechna nastavení
+    path: nastaveni
+    icon: mdi:tune
+    cards:
+      # Warning
+      - type: markdown
+        content: |
+          ## ⚠️ Pokročilá nastavení
+          
+          **Pozor!** Změna těchto parametrů může ovlivnit efektivitu a komfort vytápění.
+          
+          Pokud si nejsi jistý, použij doporučená nastavení z tabu **CH1 Topný okruh**.
+
+      # Regulace
+      - type: entities
+        title: 📐 Regulace
+        show_header_toggle: false
+        entities:
+          - entity: number.building_momentum
+            name: Konstanta setrvačnosti budovy
+          - entity: number.composite_filter_ratio
+            name: Composite Filter Ratio
+
+      # CH1 - Všechna nastavení
+      - type: entities
+        title: 🔥 CH1 - Kompletní nastavení
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Teploty
+          - entity: number.ch1_temperature_desired
+            name: Požadovaná teplota
+          - entity: number.ch1_temperature_min
+            name: Min. teplota
+          - entity: number.ch1_temperature_max
+            name: Max. teplota
+          - entity: number.ch1_temperature_antifrost
+            name: Protimrazová teplota
+          - type: section
+            label: Voda
+          - entity: number.ch1_water_temp_min
+            name: Min. teplota vody
+          - entity: number.ch1_water_temp_max
+            name: Max. teplota vody
+          - type: section
+            label: Ekvitermní křivka
+          - entity: number.ch1_equitherm_slope
+            name: Slope
+          - entity: number.ch1_equitherm_offset
+            name: Offset
+          - entity: number.ch1_equitherm_room_effect
+            name: Room Effect
+          - type: section
+            label: Pokročilé
+          - entity: number.ch1_hysteresis
+            name: Hysteresis
+          - entity: number.ch1_temp_correction
+            name: Korekce teploty
+          - entity: switch.ch1_optimal_start
+            name: Optimal Start/Stop
+
+      # Kotel
+      - type: entities
+        title: 🏭 Kotel
+        show_header_toggle: false
+        entities:
+          - entity: number.boiler_water_setpoint
+            name: Setpoint teploty vody
+          - entity: number.boiler_water_temp_min
+            name: Min. teplota
+          - entity: number.boiler_water_temp_max
+            name: Max. teplota
+
+      # TUV
+      - type: entities
+        title: 🚿 TUV
+        show_header_toggle: false
+        entities:
+          - entity: number.dhw_temperature_desired
+            name: Požadovaná teplota
+          - entity: number.dhw_temperature_min
+            name: Min. teplota
+          - entity: number.dhw_temperature_max
+            name: Max. teplota
+          - entity: number.dhw_hysteresis
+            name: Hysteresis
+
+  # ============================================================================
+  # TAB 7: DIAGNOSTIKA
+  # ============================================================================
+  - title: Diagnostika
+    path: diagnostika
+    icon: mdi:bug
+    cards:
+      # Info
+      - type: markdown
+        content: |
+          ## 🔍 Diagnostika a debug
+          
+          Zde najdeš podrobné informace pro ladění a diagnostiku systému.
+
+      # Všechny teploty
+      - type: entities
+        title: 🌡️ Všechny teploty
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Venkovní
+          - entity: sensor.outdoor_temp_composite
+            name: Composite (použito pro ekviterm)
+          - entity: sensor.outdoor_temp_damped
+            name: Tlumená
+          - type: section
+            label: Kotel
+          - entity: sensor.boiler_water_input_temp
+            name: Vstup
+          - entity: sensor.boiler_water_return_temp
+            name: Vratná
+          - entity: sensor.boiler_water_setpoint
+            name: Setpoint
+          - entity: sensor.cpu_temperature
+            name: CPU
+          - type: section
+            label: CH1
+          - entity: sensor.ch1_temperature_current
+            name: Aktuální
+          - entity: sensor.ch1_water_setpoint
+            name: Setpoint vody
+          - entity: sensor.ch1_water_input_temp
+            name: Voda vstup
+          - entity: sensor.ch1_water_return_temp
+            name: Voda vratná
+          - type: section
+            label: TUV
+          - entity: sensor.dhw_temperature_current
+            name: Aktuální
+
+      # Modbus diagnostika
+      - type: entities
+        title: 🔌 Modbus
+        show_header_toggle: false
+        entities:
+          - entity: sensor.ip_address
+            name: IP adresa
+            icon: mdi:ip-network
+
+      # Systém
+      - type: entities
+        title: 💾 Systém
+        show_header_toggle: false
+        entities:
+          - entity: sensor.cpu_temperature
+            name: Teplota CPU
+          - entity: sensor.battery_voltage
+            name: Baterie
+          - entity: sensor.boiler_pressure
+            name: Tlak
+          - entity: sensor.boiler_active_segments
+            name: Aktivní segmenty
+          - entity: sensor.boiler_inactive_segments
+            name: Neaktivní segmenty
+
+      # Multi-graph všech teplot
+      - type: history-graph
+        title: 📊 Všechny teploty (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.outdoor_temp_composite
+            name: Venkovní
+          - entity: sensor.boiler_water_input_temp
+            name: Kotel vstup
+          - entity: sensor.ch1_water_setpoint
+            name: CH1 setpoint
+          - entity: sensor.ch1_water_input_temp
+            name: CH1 vstup
+          - entity: sensor.dhw_temperature_current
+            name: TUV
+
+      # Energie spotřeba (pokud máš)
+      - type: markdown
+        content: |
+          ### 💡 Pro sledování spotřeby energie:
+          
+          Pokud chceš sledovat spotřebu elektřiny kotle, připoj energetický měřič
+          (např. Shelly EM) a přidej sem entity pro:
+          - Aktuální příkon (W)
+          - Denní spotřeba (kWh)
+          - Měsíční spotřeba (kWh)
