@@ -51,8 +51,9 @@ class JablotronVoltaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                 if connected:
                     # Try to read a basic register to verify communication
+                    # Register 1 is the first serial number register
                     test_read = await self.hass.async_add_executor_job(
-                        client.read_input_registers, 0, 1
+                        client.read_input_registers, 1, 1
                     )
 
                     await self.hass.async_add_executor_job(client.close)

@@ -205,10 +205,10 @@ class JablotronModbusClient:
         """Read all relevant data from the device in batched operations."""
         data: dict[str, Any] = {}
 
-        # Batch 1: Device info and system status (input registers 0-48)
+        # Batch 1: Device info and system status (input registers 1-49)
         # This includes: serial, device_id, hw_rev, mac, fw_rev, ip, cpu_temp,
         # battery, regulation, and boiler status
-        batch1 = self.read_input_registers(0, 49)
+        batch1 = self.read_input_registers(1, 49)
         if batch1:
             data["device_info"] = batch1[0:11]
             data["network_info"] = batch1[11:17]
@@ -216,19 +216,19 @@ class JablotronModbusClient:
             data["regulation"] = batch1[29:32]
             data["boiler_status"] = batch1[39:49]
 
-        # Batch 2: DHW status (input registers 100-101)
-        batch2 = self.read_input_registers(100, 2)
+        # Batch 2: DHW status (input registers 101-102)
+        batch2 = self.read_input_registers(101, 2)
         if batch2:
             data["dhw_status"] = batch2
 
-        # Batch 3: CH1 status (input registers 199-205)
-        batch3 = self.read_input_registers(199, 7)
+        # Batch 3: CH1 status (input registers 200-206)
+        batch3 = self.read_input_registers(200, 7)
         if batch3:
             data["ch1_status"] = batch3
 
-        # Batch 4: CH2 status (input registers 299-305)
+        # Batch 4: CH2 status (input registers 300-306)
         # Only read if CH2 is available
-        batch4 = self.read_input_registers(299, 7)
+        batch4 = self.read_input_registers(300, 7)
         if batch4:
             # Check if data is valid (not all zeros or 0xFFFF)
             if any(val != 0 and val != 0xFFFF for val in batch4):
@@ -237,43 +237,43 @@ class JablotronModbusClient:
             else:
                 data["ch2_available"] = False
 
-        # Batch 5: System alerts and ethernet config (holding registers 1000-1017)
-        batch5 = self.read_holding_registers(1000, 18)
+        # Batch 5: System alerts and ethernet config (holding registers 1001-1018)
+        batch5 = self.read_holding_registers(1001, 18)
         if batch5:
             data["system_alerts"] = batch5[0:2]
             data["ethernet_config"] = batch5[9:18]
 
-        # Batch 6: Regulation settings (holding registers 1029-1039)
-        batch6 = self.read_holding_registers(1029, 11)
+        # Batch 6: Regulation settings (holding registers 1030-1040)
+        batch6 = self.read_holding_registers(1030, 11)
         if batch6:
             data["regulation_settings"] = batch6
 
-        # Batch 7: Boiler settings (holding registers 1049-1061)
-        batch7 = self.read_holding_registers(1049, 13)
+        # Batch 7: Boiler settings (holding registers 1050-1062)
+        batch7 = self.read_holding_registers(1050, 13)
         if batch7:
             data["boiler_settings"] = batch7
 
-        # Batch 8: DHW settings (holding registers 1099-1106)
-        batch8 = self.read_holding_registers(1099, 8)
+        # Batch 8: DHW settings (holding registers 1100-1107)
+        batch8 = self.read_holding_registers(1100, 8)
         if batch8:
             data["dhw_settings"] = batch8
 
-        # Batch 9: CH1 settings (holding registers 1199-1218)
-        batch9 = self.read_holding_registers(1199, 20)
+        # Batch 9: CH1 settings (holding registers 1200-1219)
+        batch9 = self.read_holding_registers(1200, 20)
         if batch9:
             data["ch1_settings"] = batch9
 
-        # Batch 10: CH2 settings (holding registers 1299-1318)
+        # Batch 10: CH2 settings (holding registers 1300-1319)
         # Only read if CH2 is available
         if data.get("ch2_available", False):
-            batch10 = self.read_holding_registers(1299, 20)
+            batch10 = self.read_holding_registers(1300, 20)
             if batch10:
                 data["ch2_settings"] = batch10
 
-        # Batch 11: System control registers (holding registers 3000-3009)
+        # Batch 11: System control registers (holding registers 3001-3010)
         # These require authentication
         if self.authenticate_system_access():
-            batch11 = self.read_holding_registers(3000, 10)
+            batch11 = self.read_holding_registers(3001, 10)
             if batch11:
                 data["system_control"] = batch11
 
