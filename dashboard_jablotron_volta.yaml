@@ -49,6 +49,9 @@ views:
           - entity: select.jablotron_volta_regulation_mode
             name: Režim regulace
             icon: mdi:cog
+          - entity: binary_sensor.jablotron_volta_ch1_heating
+            name: Vytápění aktivní
+            icon: mdi:fire
           - entity: sensor.jablotron_volta_boiler_active_segments
             name: Aktivní topné segmenty
             icon: mdi:heating-coil
@@ -200,210 +203,9 @@ views:
 
       # Nastavení teplot
       - type: entities
-        title: 🎯 Nastavení teplot
-        show_header_toggle: false
-        entities:
-            name: Požadovaná teplota místnosti
-            icon: mdi:home-thermometer
-          - entity: number.jablotron_volta_ch1_water_temp_min
-            name: Min. teplota vody
-            icon: mdi:thermometer-chevron-down
-          - entity: number.jablotron_volta_ch1_water_temp_max
-            name: Max. teplota vody
-            icon: mdi:thermometer-chevron-up
-          - entity: number.jablotron_volta_ch1_antifrost_temp
-            name: Protimrazová teplota
-            icon: mdi:snowflake-alert
-
-      # Ekvitermní parametry
-      - type: entities
-        title: 📈 Ekvitermní parametry
-        show_header_toggle: false
-        entities:
-          - entity: number.jablotron_volta_ch1_equitherm_slope
-            name: Sklon křivky (Slope)
-            icon: mdi:angle-acute
-          - entity: number.jablotron_volta_ch1_equitherm_offset
-            name: Posun křivky (Offset)
-            icon: mdi:arrow-up-down
-          - entity: number.jablotron_volta_ch1_equitherm_room_effect
-            name: Vliv prostoru (Room Effect)
-            icon: mdi:home-variant
-
-      # Pokročilé funkce
-      - type: entities
-        title: ⚙️ Pokročilé funkce
-        show_header_toggle: false
-        entities:
-          - entity: switch.jablotron_volta_ch1_optimal_start
-            name: Optimal Start/Stop
-            icon: mdi:clock-start
-          - entity: number.jablotron_volta_ch1_hysteresis
-            name: Hysteresis
-            icon: mdi:sine-wave
-          - entity: number.jablotron_volta_ch1_temp_correction
-            name: Korekce teploty termostatu
-            icon: mdi:thermometer-plus
-
-      # Graf
-      - type: history-graph
-        title: 📈 Historie CH1 (24h)
-        hours_to_show: 24
-        refresh_interval: 300
-        entities:
-          - entity: sensor.jablotron_volta_ch1_water_setpoint
-            name: Setpoint
-          - entity: sensor.jablotron_volta_ch1_water_input_temp
-            name: Vstup
-          - entity: sensor.jablotron_volta_ch1_water_return_temp
-            name: Vratná
-
-      # Doporučení pro tvoje nastavení
-      - type: markdown
-        content: |
-          ### ✅ Doporučené nastavení (tvůj systém):
-          
-          ```yaml
-          Equitherm Slope:        0.6      ✅ Dobře
-          Equitherm Offset:       0°C      ✅ Dobře
-          Room Effect:            0%       ✅ DOPORUČENO (máš chytré termostaty)
-          Temperature Correction: 0°C      ✅ Správně (topíš ekvitermem)
-          Optimal Start/Stop:     OFF      ✅ VYPNI (termostaty to dělají)
-          Hysteresis:             2-3°C    ⚠️ Zvyš (teď 0.5°C je moc málo)
-          ```
-
-  # ============================================================================
-  # TAB 4: SYSTÉM & ÚDRŽBA
-  # ============================================================================
-  - title: Systém
-    path: system
-    icon: mdi:cog
-    cards:
-      # Režim kotle
-      - type: entities
-        title: 🎛️ Režim kotle
-        show_header_toggle: false
-        entities:
-          - entity: select.jablotron_volta_regulation_mode
-            name: Režim regulace
-            icon: mdi:cog
-          - entity: binary_sensor.jablotron_volta_ch1_heating
-            name: Vytápění aktivní
-            icon: mdi:fire
-
-      # Systémové informace
-      - type: entities
-        title: 📟 Systémové informace
-        show_header_toggle: false
-        entities:
-          - entity: sensor.jablotron_volta_cpu_temperature
-            name: Teplota CPU
-            icon: mdi:chip
-          - entity: sensor.jablotron_volta_battery_voltage
-            name: Napětí baterie
-            icon: mdi:battery
-          - entity: sensor.jablotron_volta_boiler_pressure
-            name: Tlak v systému
-            icon: mdi:gauge
-
-      # Topné segmenty
-      - type: entities
-        title: 🔥 Topné segmenty
-        show_header_toggle: false
-        entities:
-          - entity: sensor.jablotron_volta_boiler_active_segments
-            name: Aktivní segmenty
-            icon: mdi:heating-coil
-          - entity: sensor.jablotron_volta_boiler_inactive_segments
-            name: Neaktivní segmenty
-            icon: mdi:radiator-disabled
-
-      # Nastavení kotle
-      - type: entities
-        title: ⚙️ Nastavení kotle
-        show_header_toggle: false
-        entities:
-          - entity: sensor.jablotron_volta_boiler_water_setpoint
-            name: Požadovaná teplota vody
-            icon: mdi:water-thermometer
-          - entity: number.jablotron_volta_boiler_water_temp_max
-            name: Max. teplota vody
-            icon: mdi:thermometer-chevron-up
-          - entity: number.jablotron_volta_boiler_water_temp_min
-            name: Min. teplota vody
-            icon: mdi:thermometer-chevron-down
-
-      # Síťové nastavení (read-only display)
-      - type: entities
-        title: 🌐 Síť
-        show_header_toggle: false
-        state_color: false
-        entities:
-          - entity: sensor.jablotron_volta_ip_address
-            name: IP adresa
-            icon: mdi:ip-network
-
-      # Teploty kotle
-      - type: glance
-        title: 🌡️ Teploty kotle
-        show_name: true
-        show_state: true
-        columns: 2
-        entities:
-          - entity: sensor.jablotron_volta_boiler_water_input_temp
-            name: Vstup
-          - entity: sensor.jablotron_volta_boiler_water_return_temp
-            name: Vratná
-          - entity: sensor.jablotron_volta_boiler_water_setpoint
-            name: Setpoint
-          - entity: sensor.jablotron_volta_cpu_temperature
-            name: CPU
-
-      # Tlak - gauge
-      - type: gauge
-        entity: sensor.jablotron_volta_boiler_pressure
-        name: Tlak v systému
-        min: 0
-        max: 3
-        severity:
-          green: 1
-          yellow: 0.5
-          red: 2.5
-        needle: true
-        unit: bar
-
-  # ============================================================================
-  # TAB 5: TUV (Teplá užitková voda)
-  # ============================================================================
-  - title: TUV
-    path: tuv
-    icon: mdi:water-boiler
-    cards:
-      # Info
-      - type: markdown
-        content: |
-          ## 🚿 TUV - Teplá užitková voda (DHW)
-
-      # Aktuální stav
-      - type: entities
-        title: 📊 Aktuální stav
-        show_header_toggle: false
-        entities:
-          - entity: sensor.jablotron_volta_dhw_temperature_current
-            name: Aktuální teplota TUV
-            icon: mdi:thermometer
-
-      # Nastavení
-      - type: entities
         title: 🎯 Nastavení TUV
         show_header_toggle: false
         entities:
-            name: Požadovaná teplota
-            icon: mdi:thermometer
-            name: Min. teplota
-            icon: mdi:thermometer-chevron-down
-            name: Max. teplota
-            icon: mdi:thermometer-chevron-up
           - entity: number.jablotron_volta_dhw_hysteresis
             name: Hysteresis
             icon: mdi:sine-wave
@@ -462,7 +264,6 @@ views:
         entities:
           - type: section
             label: Teploty
-            name: Požadovaná teplota
           - entity: number.jablotron_volta_ch1_water_temp_min
             name: Min. teplota
           - entity: number.jablotron_volta_ch1_water_temp_max
@@ -509,9 +310,6 @@ views:
         title: 🚿 TUV
         show_header_toggle: false
         entities:
-            name: Požadovaná teplota
-            name: Min. teplota
-            name: Max. teplota
           - entity: number.jablotron_volta_dhw_hysteresis
             name: Hysteresis
 
