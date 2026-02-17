@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.2.0...jablotron-volta-v1.2.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* drop entity names ([6df97c2](https://github.com/legendik/ha-jablotron-volta/commit/6df97c2c577a0002bb494302b29ee1cada6300a5))
+* update dashboard ([5f83fd0](https://github.com/legendik/ha-jablotron-volta/commit/5f83fd0a43457b38e22c920a0900806c928a5a8d))
+
 ## [1.2.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.6...jablotron-volta-v1.2.0) (2026-02-17)
 
 
