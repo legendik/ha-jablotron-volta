@@ -27,10 +27,10 @@ views:
           - entity: sensor.jablotron_volta_outdoor_temp_damped
             name: Venkovní teplota (Tlumená)
             icon: mdi:thermometer-lines
-          - entity: sensor.jablotron_volta_boiler_water_input_temp
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
             name: Teplota vody - vstup
             icon: mdi:water-thermometer
-          - entity: sensor.jablotron_volta_boiler_water_return_temp
+          - entity: sensor.jablotron_volta_boiler_water_return_temperature
             name: Teplota vody - vratná
             icon: mdi:water-thermometer-outline
           - type: divider
@@ -70,7 +70,7 @@ views:
         entities:
           - entity: sensor.jablotron_volta_outdoor_temp_composite
             name: Venkovní (Composite)
-          - entity: sensor.jablotron_volta_boiler_water_input_temp
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
             name: Voda - vstup
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: CH1 Setpoint
@@ -148,7 +148,7 @@ views:
             name: Venkovní (Composite)
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: Teplota vody
-          - entity: sensor.jablotron_volta_ch1_water_input_temp
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: Voda vstup (skutečná)
 
       # Doporučení
@@ -194,10 +194,10 @@ views:
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: Požadovaná teplota vody
             icon: mdi:target
-          - entity: sensor.jablotron_volta_ch1_water_input_temp
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: Teplota vody - vstup
             icon: mdi:water-thermometer
-          - entity: sensor.jablotron_volta_ch1_water_return_temp
+          - entity: sensor.jablotron_volta_ch1_water_return_temperature
             name: Teplota vody - vratná
             icon: mdi:water-thermometer-outline
 
@@ -264,17 +264,17 @@ views:
         entities:
           - type: section
             label: Teploty
-          - entity: number.jablotron_volta_ch1_water_temp_min
+          - entity: number.jablotron_volta_ch1_water_temperature_min
             name: Min. teplota
-          - entity: number.jablotron_volta_ch1_water_temp_max
+          - entity: number.jablotron_volta_ch1_water_temperature_max
             name: Max. teplota
           - entity: number.jablotron_volta_ch1_antifrost_temp
             name: Protimrazová teplota
           - type: section
             label: Voda
-          - entity: number.jablotron_volta_ch1_water_temp_min
+          - entity: number.jablotron_volta_ch1_water_temperature_min
             name: Min. teplota vody
-          - entity: number.jablotron_volta_ch1_water_temp_max
+          - entity: number.jablotron_volta_ch1_water_temperature_max
             name: Max. teplota vody
           - type: section
             label: Ekvitermní křivka
@@ -300,9 +300,9 @@ views:
         entities:
           - entity: sensor.jablotron_volta_boiler_water_setpoint
             name: Setpoint teploty vody
-          - entity: number.jablotron_volta_boiler_water_temp_min
+          - entity: number.jablotron_volta_boiler_water_temperature_min
             name: Min. teplota
-          - entity: number.jablotron_volta_boiler_water_temp_max
+          - entity: number.jablotron_volta_boiler_water_temperature_max
             name: Max. teplota
 
       # TUV
@@ -340,9 +340,9 @@ views:
             name: Tlumená
           - type: section
             label: Kotel
-          - entity: sensor.jablotron_volta_boiler_water_input_temp
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
             name: Vstup
-          - entity: sensor.jablotron_volta_boiler_water_return_temp
+          - entity: sensor.jablotron_volta_boiler_water_return_temperature
             name: Vratná
           - entity: sensor.jablotron_volta_boiler_water_setpoint
             name: Setpoint
@@ -354,9 +354,9 @@ views:
             name: Aktuální
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: Setpoint vody
-          - entity: sensor.jablotron_volta_ch1_water_input_temp
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: Voda vstup
-          - entity: sensor.jablotron_volta_ch1_water_return_temp
+          - entity: sensor.jablotron_volta_ch1_water_return_temperature
             name: Voda vratná
           - type: section
             label: TUV
@@ -396,11 +396,11 @@ views:
         entities:
           - entity: sensor.jablotron_volta_outdoor_temp_composite
             name: Venkovní
-          - entity: sensor.jablotron_volta_boiler_water_input_temp
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
             name: Kotel vstup
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: CH1 setpoint
-          - entity: sensor.jablotron_volta_ch1_water_input_temp
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: CH1 vstup
           - entity: sensor.jablotron_volta_dhw_temperature_current
             name: TUV
