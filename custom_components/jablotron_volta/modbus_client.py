@@ -36,6 +36,11 @@ class JablotronModbusClient:
             result = self._client.connect()
             if result:
                 _LOGGER.debug("Successfully connected to %s:%s", self.host, self.port)
+                # Authenticate immediately after connection
+                # This is required for reading/writing holding registers
+                if not self.authenticate_system_access():
+                    _LOGGER.error("Failed to authenticate after connection")
+                    return False
             return result
         except Exception as err:
             _LOGGER.error("Connection failed to %s:%s - %s", self.host, self.port, err)
@@ -228,10 +233,8 @@ class JablotronModbusClient:
         """Read all relevant data from the device in batched operations."""
         data: dict[str, Any] = {}
 
-        # Authenticate once at the beginning for all holding register reads
-        # This prevents authentication from being called multiple times
-        if not self.authenticate_system_access():
-            _LOGGER.error("Failed to authenticate, holding registers may not be readable")
+        # Authentication is already done in connect() method
+        # No need to authenticate again here
 
         # Batch 1: Device info and system status (input registers 1-49)
         # This includes: serial, device_id, hw_rev, mac, fw_rev, ip, cpu_temp,
