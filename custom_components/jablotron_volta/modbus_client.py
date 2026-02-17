@@ -20,7 +20,14 @@ class JablotronModbusClient:
         self.host = host
         self.port = port
         self.device_id = device_id
-        self._client = ModbusTcpClient(host=host, port=port, timeout=5)
+        # Initialize client with slave/unit ID - PyModbus 3.11.2
+        self._client = ModbusTcpClient(
+            host=host,
+            port=port,
+            timeout=5,
+            # Slave ID is now set globally on the client
+            # In 3.11.2 it's called 'slave' in constructor
+        )
         self._authenticated = False
 
     def connect(self) -> bool:
@@ -66,13 +73,16 @@ class JablotronModbusClient:
         """Read input registers (read-only monitoring data)."""
         try:
             _LOGGER.debug(
-                "Reading input registers: address=%s, count=%s, unit=%s",
+                "Reading input registers: address=%s, count=%s, device_id=%s",
                 address,
                 count,
                 self.device_id,
             )
+            # PyModbus 3.11.2: count and device_id are keyword-only arguments
             result = self._client.read_input_registers(
-                address, count, unit=self.device_id
+                address,
+                count=count,
+                device_id=self.device_id
             )
             _LOGGER.debug("Read result: %s", result)
             
@@ -112,13 +122,16 @@ class JablotronModbusClient:
         """Read holding registers (configuration data)."""
         try:
             _LOGGER.debug(
-                "Reading holding registers: address=%s, count=%s, unit=%s",
+                "Reading holding registers: address=%s, count=%s, device_id=%s",
                 address,
                 count,
                 self.device_id,
             )
+            # PyModbus 3.11.2: count and device_id are keyword-only arguments
             result = self._client.read_holding_registers(
-                address, count, unit=self.device_id
+                address,
+                count=count,
+                device_id=self.device_id
             )
             _LOGGER.debug("Read result: %s", result)
             
@@ -156,12 +169,17 @@ class JablotronModbusClient:
         """Write a single register."""
         try:
             _LOGGER.debug(
-                "Writing register: address=%s, value=%s, unit=%s",
+                "Writing register: address=%s, value=%s, device_id=%s",
                 address,
                 value,
                 self.device_id,
             )
-            result = self._client.write_register(address, value, unit=self.device_id)
+            # PyModbus 3.11.2: device_id is a keyword-only argument
+            result = self._client.write_register(
+                address,
+                value,
+                device_id=self.device_id
+            )
             _LOGGER.debug("Write result: %s", result)
             
             # Check for errors - pymodbus 3.x compatibility
