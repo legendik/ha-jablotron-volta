@@ -23,262 +23,262 @@
   "entity": {
     "sensor": {
       "battery_voltage": {
-        "name": "Napětí baterie"
+        "name": "Battery Voltage"
       },
       "boiler_active_segments": {
-        "name": "Aktivní segmenty kotle"
+        "name": "Boiler Active Segments"
       },
       "boiler_heating_power": {
-        "name": "Topný výkon kotle"
+        "name": "Boiler Heating Power"
       },
       "boiler_inactive_segments": {
-        "name": "Neaktivní segmenty kotle"
+        "name": "Boiler Inactive Segments"
       },
       "boiler_pressure": {
-        "name": "Tlak v kotli"
+        "name": "Boiler Pressure"
       },
       "boiler_pump_power": {
-        "name": "Výkon čerpadla kotle"
+        "name": "Boiler Pump Power"
       },
       "boiler_pwm_value": {
-        "name": "PWM hodnota kotle"
+        "name": "Boiler PWM Value"
       },
       "boiler_total_energy": {
-        "name": "Celková topná energie"
+        "name": "Total Heating Energy"
       },
       "boiler_water_input_temp": {
-        "name": "Teplota vstupní vody kotle"
+        "name": "Boiler Water Input Temp"
       },
       "boiler_water_return_temp": {
-        "name": "Teplota vratné vody kotle"
+        "name": "Boiler Water Return Temp"
       },
       "boiler_water_setpoint": {
-        "name": "Požadovaná teplota vody kotle"
+        "name": "Boiler Water Setpoint"
       },
       "ch1_co2": {
-        "name": "OK1 CO2"
+        "name": "CH1 CO2"
       },
       "ch1_humidity": {
-        "name": "OK1 Vlhkost"
+        "name": "CH1 Humidity"
       },
       "ch1_pump_power": {
-        "name": "OK1 Výkon čerpadla"
+        "name": "CH1 Pump Power"
       },
       "ch1_temperature_current": {
-        "name": "OK1 Aktuální teplota místnosti"
+        "name": "CH1 Current Temperature"
       },
       "ch1_water_input_temp": {
-        "name": "OK1 Teplota vstupní vody"
+        "name": "CH1 Water Input Temp"
       },
       "ch1_water_return_temp": {
-        "name": "OK1 Teplota vratné vody"
+        "name": "CH1 Water Return Temp"
       },
       "ch1_water_setpoint": {
-        "name": "OK1 Požadovaná teplota vody"
+        "name": "CH1 Water Setpoint"
       },
       "ch2_co2": {
-        "name": "OK2 CO2"
+        "name": "CH2 CO2"
       },
       "ch2_humidity": {
-        "name": "OK2 Vlhkost"
+        "name": "CH2 Humidity"
       },
       "ch2_pump_power": {
-        "name": "OK2 Výkon čerpadla"
+        "name": "CH2 Pump Power"
       },
       "ch2_temperature_current": {
-        "name": "OK2 Aktuální teplota místnosti"
+        "name": "CH2 Current Temperature"
       },
       "ch2_water_input_temp": {
-        "name": "OK2 Teplota vstupní vody"
+        "name": "CH2 Water Input Temp"
       },
       "ch2_water_return_temp": {
-        "name": "OK2 Teplota vratné vody"
+        "name": "CH2 Water Return Temp"
       },
       "ch2_water_setpoint": {
-        "name": "OK2 Požadovaná teplota vody"
+        "name": "CH2 Water Setpoint"
       },
       "cpu_temperature": {
-        "name": "Teplota CPU"
+        "name": "CPU Temperature"
       },
       "dhw_temperature_current": {
-        "name": "TUV Aktuální teplota"
+        "name": "DHW Current Temperature"
       },
       "gateway": {
-        "name": "Brána"
+        "name": "Gateway"
       },
       "ip_address": {
-        "name": "IP adresa"
+        "name": "IP Address"
       },
       "outdoor_temp_composite": {
-        "name": "Venkovní teplota (kompozitní)"
+        "name": "Outdoor Temp Composite"
       },
       "outdoor_temp_damped": {
-        "name": "Venkovní teplota (tlumená)"
+        "name": "Outdoor Temp Damped"
       },
       "subnet_mask": {
-        "name": "Maska podsítě"
+        "name": "Subnet Mask"
       }
     },
     "select": {
       "ch1_regulation_strategy": {
-        "name": "OK1 Strategie regulace"
+        "name": "CH1 Regulation Strategy"
       },
       "ch2_regulation_strategy": {
-        "name": "OK2 Strategie regulace"
+        "name": "CH2 Regulation Strategy"
       },
       "control_mode": {
-        "name": "Režim řízení"
+        "name": "Control Mode"
       },
       "dhw_regulation_strategy": {
-        "name": "TUV Strategie regulace"
+        "name": "DHW Regulation Strategy"
       },
       "master_fail_mode": {
-        "name": "Režim při selhání master"
+        "name": "Master Fail Mode"
       },
       "outdoor_temp_source": {
-        "name": "Zdroj venkovní teploty"
+        "name": "Outdoor Temp Source"
       },
       "regulation_mode": {
-        "name": "Režim regulace"
+        "name": "Regulation Mode"
       }
     },
     "number": {
       "boiler_outdoor_temp_correction": {
-        "name": "Korekce venkovní teploty kotle"
+        "name": "Boiler Outdoor Temp Correction"
       },
       "boiler_water_temp_max": {
-        "name": "Max. teplota vody kotle"
+        "name": "Boiler Water Temp Max"
       },
       "boiler_water_temp_min": {
-        "name": "Min. teplota vody kotle"
+        "name": "Boiler Water Temp Min"
       },
       "building_momentum": {
-        "name": "Setrvačnost budovy"
+        "name": "Building Momentum"
       },
       "ch1_antifrost_temp": {
-        "name": "OK1 Teplota antifreeze"
+        "name": "CH1 Antifrost Temp"
       },
       "ch1_equitherm_offset": {
-        "name": "OK1 Ekvitermní offset"
+        "name": "CH1 Equitherm Offset"
       },
       "ch1_equitherm_room_effect": {
-        "name": "OK1 Ekvitermní vliv místnosti"
+        "name": "CH1 Equitherm Room Effect"
       },
       "ch1_equitherm_slope": {
-        "name": "OK1 Ekvitermní sklon"
+        "name": "CH1 Equitherm Slope"
       },
       "ch1_humidity_correction": {
-        "name": "OK1 Korekce vlhkosti"
+        "name": "CH1 Humidity Correction"
       },
       "ch1_hysteresis": {
-        "name": "OK1 Hystereze"
+        "name": "CH1 Hysteresis"
       },
       "ch1_limit_heat_temp": {
-        "name": "OK1 Limitní topná teplota"
+        "name": "CH1 Limit Heat Temp"
       },
       "ch1_temp_correction": {
-        "name": "OK1 Korekce teploty"
+        "name": "CH1 Temp Correction"
       },
       "ch1_threshold_setpoint": {
-        "name": "OK1 Prahová hodnota"
+        "name": "CH1 Threshold Setpoint"
       },
       "ch1_water_temp_max": {
-        "name": "OK1 Max. teplota vody"
+        "name": "CH1 Water Temp Max"
       },
       "ch1_water_temp_min": {
-        "name": "OK1 Min. teplota vody"
+        "name": "CH1 Water Temp Min"
       },
       "ch2_antifrost_temp": {
-        "name": "OK2 Teplota antifreeze"
+        "name": "CH2 Antifrost Temp"
       },
       "ch2_equitherm_offset": {
-        "name": "OK2 Ekvitermní offset"
+        "name": "CH2 Equitherm Offset"
       },
       "ch2_equitherm_room_effect": {
-        "name": "OK2 Ekvitermní vliv místnosti"
+        "name": "CH2 Equitherm Room Effect"
       },
       "ch2_equitherm_slope": {
-        "name": "OK2 Ekvitermní sklon"
+        "name": "CH2 Equitherm Slope"
       },
       "ch2_humidity_correction": {
-        "name": "OK2 Korekce vlhkosti"
+        "name": "CH2 Humidity Correction"
       },
       "ch2_hysteresis": {
-        "name": "OK2 Hystereze"
+        "name": "CH2 Hysteresis"
       },
       "ch2_limit_heat_temp": {
-        "name": "OK2 Limitní topná teplota"
+        "name": "CH2 Limit Heat Temp"
       },
       "ch2_temp_correction": {
-        "name": "OK2 Korekce teploty"
+        "name": "CH2 Temp Correction"
       },
       "ch2_threshold_setpoint": {
-        "name": "OK2 Prahová hodnota"
+        "name": "CH2 Threshold Setpoint"
       },
       "ch2_water_temp_max": {
-        "name": "OK2 Max. teplota vody"
+        "name": "CH2 Water Temp Max"
       },
       "ch2_water_temp_min": {
-        "name": "OK2 Min. teplota vody"
+        "name": "CH2 Water Temp Min"
       },
       "changeover_temp": {
-        "name": "Teplota přepnutí"
+        "name": "Changeover Temp"
       },
       "composite_filter_ratio": {
-        "name": "Poměr kompozitního filtru"
+        "name": "Composite Filter Ratio"
       },
       "dhw_hysteresis": {
-        "name": "TUV Hystereze"
+        "name": "DHW Hysteresis"
       },
       "outdoor_temp_manual": {
-        "name": "Venkovní teplota (manuální)"
+        "name": "Outdoor Temp Manual"
       }
     },
     "binary_sensor": {
       "ch1_heating": {
-        "name": "OK1 Topení"
+        "name": "CH1 Heating"
       },
       "ch2_heating": {
-        "name": "OK2 Topení"
+        "name": "CH2 Heating"
       },
       "dhw_heating": {
-        "name": "TUV Ohřev"
+        "name": "DHW Heating"
       },
       "system_alert": {
-        "name": "Systémové upozornění"
+        "name": "System Alert"
       }
     },
     "switch": {
       "ch1_fast_cooldown": {
-        "name": "OK1 Rychlé chlazení"
+        "name": "CH1 Fast Cooldown"
       },
       "ch1_optimal_start": {
-        "name": "OK1 Optimální start"
+        "name": "CH1 Optimal Start"
       },
       "ch2_fast_cooldown": {
-        "name": "OK2 Rychlé chlazení"
+        "name": "CH2 Fast Cooldown"
       },
       "ch2_optimal_start": {
-        "name": "OK2 Optimální start"
+        "name": "CH2 Optimal Start"
       }
     },
     "button": {
       "reset_error": {
-        "name": "Reset chyby"
+        "name": "Reset Error"
       },
       "restart_device": {
-        "name": "Restart zařízení"
+        "name": "Restart Device"
       }
     },
     "climate": {
       "dhw": {
-        "name": "TUV"
+        "name": "DHW"
       },
       "ch1": {
-        "name": "Topný okruh 1"
+        "name": "Heating Circuit 1"
       },
       "ch2": {
-        "name": "Topný okruh 2"
+        "name": "Heating Circuit 2"
       }
     }
   }
