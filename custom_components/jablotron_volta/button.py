@@ -1,4 +1,5 @@
 """Button platform for Jablotron Volta integration."""
+
 from __future__ import annotations
 
 import logging
@@ -116,6 +117,8 @@ class JablotronVoltaRestartButton(JablotronVoltaButtonBase):
         )
 
         if success:
-            _LOGGER.warning("Device restart triggered - device will be unavailable briefly")
+            _LOGGER.warning(
+                "Device restart triggered - device will be unavailable briefly"
+            )
         else:
             _LOGGER.error("Failed to restart device")

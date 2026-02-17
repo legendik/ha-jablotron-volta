@@ -1,4 +1,5 @@
 """Constants for Jablotron Volta integration."""
+
 from datetime import timedelta
 from typing import Final
 
@@ -28,7 +29,7 @@ MODEL: Final = "Volta"
 # ============================================================================
 
 # Device Information (1-11)
-REG_SERIAL_NUMBER_0: Final = 0 
+REG_SERIAL_NUMBER_0: Final = 0
 REG_SERIAL_NUMBER_1: Final = 2
 REG_DEVICE_ID_0: Final = 3
 REG_DEVICE_ID_1: Final = 4

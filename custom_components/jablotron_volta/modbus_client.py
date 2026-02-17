@@ -1,4 +1,5 @@
 """Modbus TCP client for Jablotron Volta."""
+
 from __future__ import annotations
 
 import logging
@@ -8,6 +9,25 @@ from pymodbus.client import ModbusTcpClient
 from pymodbus.exceptions import ModbusException
 
 from .const import SYSTEM_PASSWORD
+from .scaling import (
+    ip_to_registers as _ip_to_registers,
+    registers_to_ip as _registers_to_ip,
+    registers_to_mac as _registers_to_mac,
+    registers_to_uint32 as _registers_to_uint32,
+    scale_percentage as _scale_percentage,
+    scale_pressure as _scale_pressure,
+    scale_ratio as _scale_ratio,
+    scale_signed_percentage as _scale_signed_percentage,
+    scale_signed_temperature as _scale_signed_temperature,
+    scale_temperature as _scale_temperature,
+    scale_voltage as _scale_voltage,
+    unscale_percentage as _unscale_percentage,
+    unscale_pressure as _unscale_pressure,
+    unscale_ratio as _unscale_ratio,
+    unscale_signed_temperature as _unscale_signed_temperature,
+    unscale_temperature as _unscale_temperature,
+    unscale_voltage as _unscale_voltage,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,7 +67,13 @@ class JablotronModbusClient:
                 _LOGGER.error("Connection failed (result was False)")
             return result
         except Exception as err:
-            _LOGGER.error("Connection failed to %s:%s - %s", self.host, self.port, err, exc_info=True)
+            _LOGGER.error(
+                "Connection failed to %s:%s - %s",
+                self.host,
+                self.port,
+                err,
+                exc_info=True,
+            )
             return False
 
     def close(self) -> None:
@@ -67,25 +93,25 @@ class JablotronModbusClient:
 
         try:
             # Write password directly without calling write_register to avoid recursion
-            _LOGGER.info("Authenticating with password %s to register 3001", SYSTEM_PASSWORD)
-            result = self._client.write_register(
-                3001,
-                SYSTEM_PASSWORD,
-                device_id=self.device_id
+            _LOGGER.info(
+                "Authenticating with password %s to register 3001", SYSTEM_PASSWORD
             )
-            
+            result = self._client.write_register(
+                3001, SYSTEM_PASSWORD, device_id=self.device_id
+            )
+
             _LOGGER.info("Authentication result: %s (type: %s)", result, type(result))
-            
+
             # Check for errors
-            if hasattr(result, 'isError') and result.isError():
+            if hasattr(result, "isError") and result.isError():
                 _LOGGER.error("System authentication failed with error: %s", result)
                 return False
-            
+
             # Check if result indicates success
-            if not hasattr(result, 'function_code'):
+            if not hasattr(result, "function_code"):
                 _LOGGER.error("Unexpected authentication response format: %s", result)
                 return False
-            
+
             self._authenticated = True
             _LOGGER.info("System authentication successful!")
             return True
@@ -93,9 +119,7 @@ class JablotronModbusClient:
             _LOGGER.error("Authentication exception: %s", err, exc_info=True)
             return False
 
-    def read_input_registers(
-        self, address: int, count: int = 1
-    ) -> list[int] | None:
+    def read_input_registers(self, address: int, count: int = 1) -> list[int] | None:
         """Read input registers (read-only monitoring data)."""
         try:
             _LOGGER.debug(
@@ -106,14 +130,12 @@ class JablotronModbusClient:
             )
             # PyModbus 3.11.2: count and device_id are keyword-only arguments
             result = self._client.read_input_registers(
-                address,
-                count=count,
-                device_id=self.device_id
+                address, count=count, device_id=self.device_id
             )
             _LOGGER.debug("Read result: %s", result)
-            
+
             # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, 'isError') and result.isError():
+            if hasattr(result, "isError") and result.isError():
                 _LOGGER.error(
                     "Modbus error reading input registers at %s (count %s): %s",
                     address,
@@ -121,9 +143,9 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
-            
+
             # Alternative error check for newer pymodbus versions
-            if not hasattr(result, 'registers'):
+            if not hasattr(result, "registers"):
                 _LOGGER.error(
                     "Invalid response reading input registers at %s (count %s): %s",
                     address,
@@ -131,9 +153,13 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
-                
-            _LOGGER.debug("Successfully read %s registers from address %s: %s", 
-                         len(result.registers), address, result.registers)
+
+            _LOGGER.debug(
+                "Successfully read %s registers from address %s: %s",
+                len(result.registers),
+                address,
+                result.registers,
+            )
             return result.registers
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading input registers: %s", err)
@@ -142,11 +168,9 @@ class JablotronModbusClient:
             _LOGGER.exception("Unexpected error reading input registers: %s", err)
             return None
 
-    def read_holding_registers(
-        self, address: int, count: int = 1
-    ) -> list[int] | None:
+    def read_holding_registers(self, address: int, count: int = 1) -> list[int] | None:
         """Read holding registers (configuration data).
-        
+
         Note: Authentication must be performed before calling this method.
         Use authenticate_system_access() before reading holding registers.
         """
@@ -159,14 +183,12 @@ class JablotronModbusClient:
             )
             # PyModbus 3.11.2: count and device_id are keyword-only arguments
             result = self._client.read_holding_registers(
-                address,
-                count=count,
-                device_id=self.device_id
+                address, count=count, device_id=self.device_id
             )
             _LOGGER.debug("Read result: %s", result)
-            
+
             # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, 'isError') and result.isError():
+            if hasattr(result, "isError") and result.isError():
                 _LOGGER.error(
                     "Modbus error reading holding registers at %s (count %s): %s",
                     address,
@@ -174,9 +196,9 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
-            
+
             # Alternative error check for newer pymodbus versions
-            if not hasattr(result, 'registers'):
+            if not hasattr(result, "registers"):
                 _LOGGER.error(
                     "Invalid response reading holding registers at %s (count %s): %s",
                     address,
@@ -184,9 +206,13 @@ class JablotronModbusClient:
                     result,
                 )
                 return None
-                
-            _LOGGER.debug("Successfully read %s registers from address %s: %s",
-                         len(result.registers), address, result.registers)
+
+            _LOGGER.debug(
+                "Successfully read %s registers from address %s: %s",
+                len(result.registers),
+                address,
+                result.registers,
+            )
             return result.registers
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading holding registers: %s", err)
@@ -207,7 +233,7 @@ class JablotronModbusClient:
                         address,
                     )
                     return False
-            
+
             _LOGGER.debug(
                 "Writing register: address=%s, value=%s, device_id=%s",
                 address,
@@ -216,14 +242,12 @@ class JablotronModbusClient:
             )
             # PyModbus 3.11.2: device_id is a keyword-only argument
             result = self._client.write_register(
-                address,
-                value,
-                device_id=self.device_id
+                address, value, device_id=self.device_id
             )
             _LOGGER.debug("Write result: %s", result)
-            
+
             # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, 'isError') and result.isError():
+            if hasattr(result, "isError") and result.isError():
                 _LOGGER.error(
                     "Modbus error writing register at %s with value %s: %s",
                     address,
@@ -231,7 +255,7 @@ class JablotronModbusClient:
                     result,
                 )
                 return False
-            
+
             _LOGGER.debug("Successfully wrote %s to register %s", value, address)
             return True
         except ModbusException as err:
@@ -250,7 +274,7 @@ class JablotronModbusClient:
 
         # Batch 1: Device info and system status (input registers)
         # Note: Not all registers exist - we read in chunks to avoid gaps
-        
+
         # 1-17: Serial, device ID, HW/FW versions, MAC, IP
         batch1a = self.read_input_registers(1, 17)
         # 20-21: System info
@@ -259,7 +283,7 @@ class JablotronModbusClient:
         batch1c = self.read_input_registers(30, 3)
         # 40-49: Boiler status
         batch1d = self.read_input_registers(40, 10)
-        
+
         if batch1a and batch1b and batch1c and batch1d:
             # Combine with gaps filled as zeros
             batch1 = batch1a + [0, 0] + batch1b + [0] * 8 + batch1c + [0] * 7 + batch1d
@@ -294,7 +318,7 @@ class JablotronModbusClient:
         batch5a = self.read_holding_registers(1001, 2)
         if batch5a:
             data["system_alerts"] = batch5a
-        
+
         # Batch 5b: Ethernet config (holding registers 1010-1018)
         batch5b = self.read_holding_registers(1010, 9)
         if batch5b:
@@ -304,7 +328,7 @@ class JablotronModbusClient:
         batch6a = self.read_holding_registers(1030, 6)
         if batch6a:
             data["regulation_settings"] = batch6a
-        
+
         # Batch 6b: Regulation setting (holding register 1040)
         batch6b = self.read_holding_registers(1040, 1)
         if batch6b:
@@ -324,7 +348,7 @@ class JablotronModbusClient:
         batch8a = self.read_holding_registers(1100, 5)
         if batch8a:
             data["dhw_settings"] = batch8a
-        
+
         # Batch 8b: DHW settings (holding registers 1106-1107)
         batch8b = self.read_holding_registers(1106, 2)
         if batch8b:
@@ -354,115 +378,92 @@ class JablotronModbusClient:
 
         return data
 
+    # ------------------------------------------------------------------
+    # Delegated scaling helpers (thin wrappers for backward compat)
+    # The real implementations live in scaling.py for easy testing.
+    # ------------------------------------------------------------------
+
     @staticmethod
     def registers_to_ip(reg0: int, reg1: int) -> str:
         """Convert two registers to IP address."""
-        return f"{reg0 >> 8}.{reg0 & 0xFF}.{reg1 >> 8}.{reg1 & 0xFF}"
+        return _registers_to_ip(reg0, reg1)
 
     @staticmethod
     def ip_to_registers(ip: str) -> tuple[int, int]:
         """Convert IP address to two registers."""
-        parts = [int(p) for p in ip.split(".")]
-        reg0 = (parts[0] << 8) | parts[1]
-        reg1 = (parts[2] << 8) | parts[3]
-        return reg0, reg1
+        return _ip_to_registers(ip)
 
     @staticmethod
     def registers_to_mac(reg0: int, reg1: int, reg2: int) -> str:
         """Convert three registers to MAC address."""
-        return (
-            f"{reg0 >> 8:02X}:{reg0 & 0xFF:02X}:"
-            f"{reg1 >> 8:02X}:{reg1 & 0xFF:02X}:"
-            f"{reg2 >> 8:02X}:{reg2 & 0xFF:02X}"
-        )
+        return _registers_to_mac(reg0, reg1, reg2)
 
     @staticmethod
     def registers_to_uint32(reg0: int, reg1: int) -> int:
         """Convert two registers to 32-bit unsigned integer."""
-        return (reg0 << 16) | reg1
+        return _registers_to_uint32(reg0, reg1)
 
     @staticmethod
     def scale_temperature(value: int) -> float:
-        """Scale temperature value (0.1°C resolution)."""
-        return value / 10.0
-    
+        """Scale temperature value (0.1 C resolution)."""
+        return _scale_temperature(value)
+
     @staticmethod
     def scale_signed_temperature(value: int) -> float:
-        """Scale signed temperature value (0.1°C resolution).
-        
-        Converts unsigned int16 to signed int16 first, then scales.
-        Example: 65516 (0xFFEC) -> -20 -> -2.0°C
-        """
-        # Convert unsigned int16 to signed int16
-        if value > 32767:
-            value = value - 65536
-        return value / 10.0
+        """Scale signed temperature value (0.1 C resolution)."""
+        return _scale_signed_temperature(value)
 
     @staticmethod
     def scale_voltage(value: int) -> float:
         """Scale voltage value (0.1V resolution)."""
-        return value / 10.0
+        return _scale_voltage(value)
 
     @staticmethod
     def scale_pressure(value: int) -> float:
         """Scale pressure value (0.1 bar resolution)."""
-        return value / 10.0
+        return _scale_pressure(value)
 
     @staticmethod
     def scale_percentage(value: int) -> float:
         """Scale percentage value (0.1% resolution)."""
-        return value / 10.0
-    
+        return _scale_percentage(value)
+
     @staticmethod
     def scale_signed_percentage(value: int) -> float:
-        """Scale signed percentage value (0.1% resolution).
-        
-        Converts unsigned int16 to signed int16 first, then scales.
-        """
-        # Convert unsigned int16 to signed int16
-        if value > 32767:
-            value = value - 65536
-        return value / 10.0
+        """Scale signed percentage value (0.1% resolution)."""
+        return _scale_signed_percentage(value)
 
     @staticmethod
     def scale_ratio(value: int) -> float:
         """Scale ratio value (0.1 resolution)."""
-        return value / 10.0
+        return _scale_ratio(value)
 
     @staticmethod
     def unscale_temperature(value: float) -> int:
         """Unscale temperature value for writing."""
-        return int(value * 10)
-    
+        return _unscale_temperature(value)
+
     @staticmethod
     def unscale_signed_temperature(value: float) -> int:
-        """Unscale signed temperature value for writing.
-        
-        Scales value and converts signed int16 to unsigned int16.
-        Example: -2.0°C -> -20 -> 65516 (0xFFEC)
-        """
-        scaled = int(value * 10)
-        # Convert signed int16 to unsigned int16
-        if scaled < 0:
-            scaled = scaled + 65536
-        return scaled
+        """Unscale signed temperature value for writing."""
+        return _unscale_signed_temperature(value)
 
     @staticmethod
     def unscale_voltage(value: float) -> int:
         """Unscale voltage value for writing."""
-        return int(value * 10)
+        return _unscale_voltage(value)
 
     @staticmethod
     def unscale_pressure(value: float) -> int:
         """Unscale pressure value for writing."""
-        return int(value * 10)
+        return _unscale_pressure(value)
 
     @staticmethod
     def unscale_percentage(value: float) -> int:
         """Unscale percentage value for writing."""
-        return int(value * 10)
+        return _unscale_percentage(value)
 
     @staticmethod
     def unscale_ratio(value: float) -> int:
         """Unscale ratio value for writing."""
-        return int(value * 10)
+        return _unscale_ratio(value)

@@ -1,4 +1,5 @@
 """Switch platform for Jablotron Volta integration."""
+
 from __future__ import annotations
 
 import logging

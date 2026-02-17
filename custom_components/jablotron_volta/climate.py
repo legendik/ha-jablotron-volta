@@ -1,4 +1,5 @@
 """Climate platform for Jablotron Volta integration."""
+
 from __future__ import annotations
 
 import logging
@@ -161,9 +162,7 @@ class JablotronVoltaDHWClimate(JablotronVoltaClimateBase):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return additional state attributes."""
         return {
-            "regulation_strategy": self.coordinator.data.get(
-                "dhw_regulation_strategy"
-            ),
+            "regulation_strategy": self.coordinator.data.get("dhw_regulation_strategy"),
             "hysteresis": self.coordinator.data.get("dhw_hysteresis"),
         }
 
@@ -285,7 +284,9 @@ class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
         }
 
         # Add humidity and CO2 if available
-        if (humidity := self.coordinator.data.get(f"ch{self._circuit}_humidity")) is not None:
+        if (
+            humidity := self.coordinator.data.get(f"ch{self._circuit}_humidity")
+        ) is not None:
             attrs["humidity"] = humidity
 
         if (co2 := self.coordinator.data.get(f"ch{self._circuit}_co2")) is not None:

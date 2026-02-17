@@ -1,4 +1,5 @@
 """Select platform for Jablotron Volta integration."""
+
 from __future__ import annotations
 
 import logging
@@ -148,7 +149,10 @@ class JablotronVoltaSelect(CoordinatorEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        if not self.entity_description.options_map or not self.entity_description.register:
+        if (
+            not self.entity_description.options_map
+            or not self.entity_description.register
+        ):
             return
 
         # Find the value for the selected option
@@ -159,7 +163,9 @@ class JablotronVoltaSelect(CoordinatorEntity, SelectEntity):
                 break
 
         if value is None:
-            _LOGGER.error("Invalid option %s for %s", option, self.entity_description.key)
+            _LOGGER.error(
+                "Invalid option %s for %s", option, self.entity_description.key
+            )
             return
 
         success = await self.hass.async_add_executor_job(
@@ -171,6 +177,4 @@ class JablotronVoltaSelect(CoordinatorEntity, SelectEntity):
         if success:
             await self.coordinator.async_request_refresh()
         else:
-            _LOGGER.error(
-                "Failed to set %s to %s", self.entity_description.key, option
-            )
+            _LOGGER.error("Failed to set %s to %s", self.entity_description.key, option)
