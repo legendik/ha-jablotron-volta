@@ -56,13 +56,22 @@ class JablotronModbusClient:
             return True
 
         try:
-            result = self.write_register(3000, SYSTEM_PASSWORD)
-            if result:
-                self._authenticated = True
-                _LOGGER.debug("System authentication successful")
-            else:
-                _LOGGER.warning("System authentication failed")
-            return result
+            # Write password directly without calling write_register to avoid recursion
+            _LOGGER.debug("Authenticating with password to register 3001")
+            result = self._client.write_register(
+                3001,
+                SYSTEM_PASSWORD,
+                device_id=self.device_id
+            )
+            
+            # Check for errors
+            if hasattr(result, 'isError') and result.isError():
+                _LOGGER.warning("System authentication failed: %s", result)
+                return False
+            
+            self._authenticated = True
+            _LOGGER.debug("System authentication successful")
+            return True
         except Exception as err:
             _LOGGER.error("Authentication error: %s", err)
             return False
@@ -168,6 +177,16 @@ class JablotronModbusClient:
     def write_register(self, address: int, value: int) -> bool:
         """Write a single register."""
         try:
+            # Holding registers (1000-3999) require authentication
+            # Authenticate before writing to any holding register
+            if 1000 <= address <= 3999:
+                if not self.authenticate_system_access():
+                    _LOGGER.error(
+                        "Failed to authenticate before writing to register %s",
+                        address,
+                    )
+                    return False
+            
             _LOGGER.debug(
                 "Writing register: address=%s, value=%s, device_id=%s",
                 address,
