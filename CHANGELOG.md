@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.1...jablotron-volta-v1.3.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* better translation keys ([410dd23](https://github.com/legendik/ha-jablotron-volta/commit/410dd23725cecc81a08189e673532754ec0e7efb))
+
 ## [1.3.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.0...jablotron-volta-v1.3.1) (2026-02-17)
 
 
