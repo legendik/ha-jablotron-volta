@@ -130,6 +130,15 @@ class JablotronModbusClient:
     ) -> list[int] | None:
         """Read holding registers (configuration data)."""
         try:
+            # Holding registers (1000-3999) require authentication even for reading
+            if 1000 <= address <= 3999:
+                if not self.authenticate_system_access():
+                    _LOGGER.error(
+                        "Failed to authenticate before reading holding registers at %s",
+                        address,
+                    )
+                    return None
+            
             _LOGGER.debug(
                 "Reading holding registers: address=%s, count=%s, device_id=%s",
                 address,
