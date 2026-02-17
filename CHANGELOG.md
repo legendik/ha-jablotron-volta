@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.3](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.2...jablotron-volta-v1.1.3) (2026-02-17)
+
+
+### Bug Fixes
+
+* authenticate once at start of read_all_data for holding registers ([dc56ad5](https://github.com/legendik/ha-jablotron-volta/commit/dc56ad52b19edc4b37ec010da348ae283b1d0167))
+
+
+### Miscellaneous
+
+* use releas_please_token ([367c618](https://github.com/legendik/ha-jablotron-volta/commit/367c618627e98be39a0491a36c7f30cebaa876bf))
+
 ## [1.1.2](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.1...jablotron-volta-v1.1.2) (2026-02-17)
 
 
