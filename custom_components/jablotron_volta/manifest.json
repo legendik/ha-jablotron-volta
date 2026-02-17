@@ -1,0 +1,12 @@
+{
+  "domain": "jablotron_volta",
+  "name": "Jablotron Volta",
+  "codeowners": ["@legendik"],
+  "config_flow": true,
+  "documentation": "https://github.com/legendik/ha-jablotron-volta",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/legendik/ha-jablotron-volta/issues",
+  "requirements": ["pymodbus==3.6.0"],
+  "version": "0.1.0"
+}

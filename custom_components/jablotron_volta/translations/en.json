@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Jablotron Volta",
+        "description": "Enter the connection details for your Jablotron Volta device",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "device_id": "Device ID (Modbus Slave ID)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the device",
+      "cannot_read": "Connected but failed to read data from the device",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}

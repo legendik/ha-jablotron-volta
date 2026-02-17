@@ -1,0 +1,297 @@
+"""Constants for Jablotron Volta integration."""
+from datetime import timedelta
+from typing import Final
+
+DOMAIN: Final = "jablotron_volta"
+DEFAULT_NAME: Final = "Jablotron Volta"
+DEFAULT_PORT: Final = 502
+DEFAULT_DEVICE_ID: Final = 1
+DEFAULT_SCAN_INTERVAL: Final = 30
+
+# Config flow
+CONF_HOST: Final = "host"
+CONF_PORT: Final = "port"
+CONF_DEVICE_ID: Final = "device_id"
+
+# Data update
+UPDATE_INTERVAL: Final = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
+
+# System password for protected registers
+SYSTEM_PASSWORD: Final = 5586
+
+# Device info
+MANUFACTURER: Final = "Jablotron"
+MODEL: Final = "Volta"
+
+# ============================================================================
+# INPUT REGISTERS (Read-only monitoring) - Register addresses are 0-based
+# ============================================================================
+
+# Device Information (1-11)
+REG_SERIAL_NUMBER_0: Final = 0  # Address 1 in docs (Modbus uses 0-based)
+REG_SERIAL_NUMBER_1: Final = 1
+REG_DEVICE_ID_0: Final = 2
+REG_DEVICE_ID_1: Final = 3
+REG_HW_REVISION_0: Final = 4
+REG_HW_REVISION_1: Final = 5
+REG_ETHERNET_MAC_0: Final = 6
+REG_ETHERNET_MAC_1: Final = 7
+REG_ETHERNET_MAC_2: Final = 8
+REG_FIRM_REVISION_0: Final = 9
+REG_FIRM_REVISION_1: Final = 10
+
+# Network Information (12-17)
+REG_ETH_MY_IP_0: Final = 11
+REG_ETH_MY_IP_1: Final = 12
+REG_ETH_MY_MASK_IP_0: Final = 13
+REG_ETH_MY_MASK_IP_1: Final = 14
+REG_ETH_MY_GATEWAY_IP_0: Final = 15
+REG_ETH_MY_GATEWAY_IP_1: Final = 16
+
+# System Status (20-21)
+REG_SYS_CPU_TEMPER: Final = 19
+REG_SYS_BATTERY_VOLTAGE: Final = 20
+
+# Regulation (30-32)
+REG_REGU_MODE_CURRENT: Final = 29
+REG_REGU_TEMPER_DAMPED: Final = 30
+REG_REGU_TEMPER_COMPOSITE: Final = 31
+
+# Boiler/Electric (40-49)
+REG_ELE_STATUS: Final = 39
+REG_ELE_INACTIVE_SEGMENTS: Final = 40
+REG_ELE_PRESSURE_WATER: Final = 41
+REG_ELE_REQUEST_MASK: Final = 42
+REG_ELE_TEMPER_WATER_INPUT: Final = 43
+REG_ELE_TEMPER_WATER_RETURN: Final = 44
+REG_ELE_PUMP_POWER: Final = 45
+REG_ELE_HEATING_POWER: Final = 46
+REG_ELE_ANALOG_VALUE: Final = 47
+REG_ELE_HEAT_FINAL_PWM_VALUE: Final = 48
+
+# DHW (Domestic Hot Water) (101-102)
+REG_DHW_STATE_HEAT: Final = 100
+REG_DHW_TEMPER_CURRENT: Final = 101
+
+# Heating Circuit 1 (200-206)
+REG_CH1_STATE_HEAT: Final = 199
+REG_CH1_TEMPER_CURRENT: Final = 200
+REG_CH1_TEMPER_WATER_INPUT: Final = 201
+REG_CH1_TEMPER_WATER_RETURN: Final = 202
+REG_CH1_PUMP_POWER: Final = 203
+REG_CH1_HUMIDITY_RELATIVE: Final = 204
+REG_CH1_CARBON_DIOXIDE_ROOM: Final = 205
+
+# Heating Circuit 2 (300-306)
+REG_CH2_STATE_HEAT: Final = 299
+REG_CH2_TEMPER_CURRENT: Final = 300
+REG_CH2_TEMPER_WATER_INPUT: Final = 301
+REG_CH2_TEMPER_WATER_RETURN: Final = 302
+REG_CH2_PUMP_POWER: Final = 303
+REG_CH2_HUMIDITY_RELATIVE: Final = 304
+REG_CH2_CARBON_DIOXIDE_ROOM: Final = 305
+
+# ============================================================================
+# HOLDING REGISTERS (Read/Write configuration) - Register addresses are 0-based
+# ============================================================================
+
+# System Alerts (1001-1002)
+REG_SYS_ATTENTION_0: Final = 1000
+REG_SYS_ATTENTION_1: Final = 1001
+
+# Ethernet Configuration (1010-1018)
+REG_ETH_CONTROL: Final = 1009
+REG_ETH_STATIC_IP_0: Final = 1010
+REG_ETH_STATIC_IP_1: Final = 1011
+REG_ETH_STATIC_MASK_IP_0: Final = 1012
+REG_ETH_STATIC_MASK_IP_1: Final = 1013
+REG_ETH_STATIC_GATEWAY_IP_0: Final = 1014
+REG_ETH_STATIC_GATEWAY_IP_1: Final = 1015
+REG_ETH_STATIC_DNS_0_IP_0: Final = 1016
+REG_ETH_STATIC_DNS_0_IP_1: Final = 1017
+
+# Regulation Settings (1030-1035)
+REG_REGU_MODE_USER: Final = 1029
+REG_REGU_SOURCE_OUT_TEMPER: Final = 1030
+REG_REGU_BUILDING_MOMENTUM: Final = 1031
+REG_REGU_COMPOSITE_FILTER_RATIO: Final = 1032
+REG_REGU_TEMPER_CHANGEOVER: Final = 1033
+REG_REGU_TEMPER_OUTSIDE: Final = 1034
+
+# UI Settings (1040)
+REG_UI_SHOW_VALUES_MASK_91: Final = 1039
+
+# Boiler Settings (1050-1062)
+REG_ELE_LOAD_RELEASE: Final = 1049
+REG_ELE_HDO_HIGH_TARIFF: Final = 1050
+REG_ELE_CORR_TEMP_OUTSIDE: Final = 1051
+REG_ELE_POWER_TOTAL_CH: Final = 1052
+REG_ELE_TEMPER_WATER_FINAL: Final = 1053
+REG_ELE_TEMPER_WATER_MAX: Final = 1054
+REG_ELE_TEMPER_WATER_MIN: Final = 1055
+REG_ELE_POWER_SEG_1: Final = 1056
+REG_ELE_POWER_SEG_2: Final = 1057
+REG_ELE_POWER_SEG_3: Final = 1058
+REG_ELE_POWER_SEG_4: Final = 1059
+REG_ELE_POWER_SEG_5: Final = 1060
+REG_ELE_POWER_SEG_6: Final = 1061
+
+# DHW Settings (1100-1107)
+REG_DHW_MODE: Final = 1099
+REG_DHW_TEMPER_DESIRED: Final = 1100
+REG_DHW_TEMPER_SET_MIN: Final = 1101
+REG_DHW_TEMPER_SET_MAX: Final = 1102
+REG_DHW_TEMPER_MANUAL: Final = 1103
+REG_DHW_TEMPER_HYSTERESIS: Final = 1105
+REG_DHW_REGULATION_STRAT: Final = 1106
+
+# Heating Circuit 1 Settings (1200-1219)
+REG_CH1_MODE: Final = 1199
+REG_CH1_TEMPER_DESIRED: Final = 1200
+REG_CH1_TEMPER_SET_MIN: Final = 1201
+REG_CH1_TEMPER_SET_MAX: Final = 1202
+REG_CH1_TEMPER_MANUAL: Final = 1203
+REG_CH1_TEMPER_ANTIFROST: Final = 1204
+REG_CH1_TEMPER_HYSTERESIS: Final = 1205
+REG_CH1_REGULATION_STRAT: Final = 1206
+REG_CH1_TEMPER_WATER_MIN: Final = 1207
+REG_CH1_TEMPER_WATER_MAX: Final = 1208
+REG_CH1_SETPOINT_DESIRED: Final = 1209
+REG_CH1_EQUITHERM_SLOPE: Final = 1210
+REG_CH1_EQUITHERM_OFFSET: Final = 1211
+REG_CH1_EQUITHERM_ROOM_EFFECT: Final = 1212
+REG_CH1_THRESHOLD_SETPOINT: Final = 1213
+REG_CH1_LIMIT_HEAT_TEMPER: Final = 1214
+REG_CH1_OPTIMAL_ON_OFF_ENABLE: Final = 1215
+REG_CH1_FAST_COOLDOWN: Final = 1216
+REG_CH1_UI_SENSOR_CORR_TEMP_78: Final = 1217
+REG_CH1_UI_SENSOR_CORR_HUMI_79: Final = 1218
+
+# Heating Circuit 2 Settings (1300-1319)
+REG_CH2_MODE: Final = 1299
+REG_CH2_TEMPER_DESIRED: Final = 1300
+REG_CH2_TEMPER_SET_MIN: Final = 1301
+REG_CH2_TEMPER_SET_MAX: Final = 1302
+REG_CH2_TEMPER_MANUAL: Final = 1303
+REG_CH2_TEMPER_ANTIFROST: Final = 1304
+REG_CH2_TEMPER_HYSTERESIS: Final = 1305
+REG_CH2_REGULATION_STRAT: Final = 1306
+REG_CH2_TEMPER_WATER_MIN: Final = 1307
+REG_CH2_TEMPER_WATER_MAX: Final = 1308
+REG_CH2_SETPOINT_DESIRED: Final = 1309
+REG_CH2_EQUITHERM_SLOPE: Final = 1310
+REG_CH2_EQUITHERM_OFFSET: Final = 1311
+REG_CH2_EQUITHERM_ROOM_EFFECT: Final = 1312
+REG_CH2_THRESHOLD_SETPOINT: Final = 1313
+REG_CH2_LIMIT_HEAT_TEMPER: Final = 1314
+REG_CH2_OPTIMAL_ON_OFF_ENABLE: Final = 1315
+REG_CH2_FAST_COOLDOWN: Final = 1316
+REG_CH2_UI_SENSOR_CORR_TEMP_78: Final = 1317
+REG_CH2_UI_SENSOR_CORR_HUMI_79: Final = 1318
+
+# ============================================================================
+# HOLDING SYSTEM REGISTERS (Protected - requires password 5586)
+# ============================================================================
+REG_SYS_PASSWORD: Final = 3000
+REG_SYS_CONTROL: Final = 3001
+REG_SYS_RESET: Final = 3002
+REG_SYS_ERROR_CODE: Final = 3003
+REG_SYS_RTU_SPEED: Final = 3004
+REG_SYS_MASTER_FAIL: Final = 3005
+REG_SYS_MASTER_TIMEOUT: Final = 3006
+REG_SYS_REQUESTED_POWER: Final = 3007
+REG_SYS_DEV_TYPE: Final = 3008
+REG_SYS_CIRCUIT_MASK: Final = 3009
+
+# ============================================================================
+# ENUM MAPPINGS
+# ============================================================================
+
+# Regulation Mode (REG_REGU_MODE_USER / REG_REGU_MODE_CURRENT)
+REGU_MODE_STANDBY: Final = 1
+REGU_MODE_AUTO: Final = 2
+REGU_MODE_SUMMER: Final = 4
+REGU_MODE_WINTER: Final = 8
+
+REGU_MODE_MAP: Final = {
+    REGU_MODE_STANDBY: "standby",
+    REGU_MODE_AUTO: "auto",
+    REGU_MODE_SUMMER: "summer",
+    REGU_MODE_WINTER: "winter",
+}
+
+# Outdoor Temperature Source (REG_REGU_SOURCE_OUT_TEMPER)
+OUT_TEMP_SOURCE_NONE: Final = 0
+OUT_TEMP_SOURCE_BOILER: Final = 1
+OUT_TEMP_SOURCE_CLOUD: Final = 2
+OUT_TEMP_SOURCE_IOMODULE: Final = 3
+
+OUT_TEMP_SOURCE_MAP: Final = {
+    OUT_TEMP_SOURCE_NONE: "none",
+    OUT_TEMP_SOURCE_BOILER: "boiler",
+    OUT_TEMP_SOURCE_CLOUD: "cloud",
+    OUT_TEMP_SOURCE_IOMODULE: "iomodule",
+}
+
+# DHW Mode (REG_DHW_MODE)
+DHW_MODE_STANDBY: Final = 0
+DHW_MODE_MANUAL: Final = 1
+DHW_MODE_SCHEDULE: Final = 2
+
+DHW_MODE_MAP: Final = {
+    DHW_MODE_STANDBY: "off",
+    DHW_MODE_MANUAL: "heat",
+    DHW_MODE_SCHEDULE: "auto",
+}
+
+# Heating Circuit Mode (REG_CH1_MODE / REG_CH2_MODE)
+CH_MODE_STANDBY: Final = 0
+CH_MODE_MANUAL: Final = 1
+CH_MODE_SCHEDULE: Final = 2
+
+CH_MODE_MAP: Final = {
+    CH_MODE_STANDBY: "off",
+    CH_MODE_MANUAL: "heat",
+    CH_MODE_SCHEDULE: "auto",
+}
+
+# Regulation Strategy (REG_CH1_REGULATION_STRAT / REG_CH2_REGULATION_STRAT)
+STRAT_DIRECT_SETPOINT: Final = 0
+STRAT_CONSTANT_WATER_TEMP: Final = 1
+STRAT_EQUITHERM_ROOM: Final = 3
+STRAT_ROOM_PID: Final = 4
+STRAT_FLOOR_DRYING_1: Final = 5
+STRAT_FLOOR_DRYING_2: Final = 6
+STRAT_FLOOR_DRYING_3: Final = 7
+STRAT_ANALOG_0_10V: Final = 8
+
+REGULATION_STRAT_MAP: Final = {
+    STRAT_DIRECT_SETPOINT: "direct_setpoint",
+    STRAT_CONSTANT_WATER_TEMP: "constant_water_temp",
+    STRAT_EQUITHERM_ROOM: "equitherm_with_room",
+    STRAT_ROOM_PID: "room_pid",
+    STRAT_FLOOR_DRYING_1: "floor_drying_1",
+    STRAT_FLOOR_DRYING_2: "floor_drying_2",
+    STRAT_FLOOR_DRYING_3: "floor_drying_3",
+    STRAT_ANALOG_0_10V: "analog_0_10v",
+}
+
+# System Control Mode (REG_SYS_CONTROL)
+CONTROL_MONITORING: Final = 0
+CONTROL_FULL: Final = 1
+CONTROL_POWER: Final = 2
+
+CONTROL_MODE_MAP: Final = {
+    CONTROL_MONITORING: "monitoring",
+    CONTROL_FULL: "full_control",
+    CONTROL_POWER: "power_control",
+}
+
+# Master Fail Behavior (REG_SYS_MASTER_FAIL)
+MASTER_FAIL_STANDBY: Final = 0
+MASTER_FAIL_NO_ACTION: Final = 1
+
+MASTER_FAIL_MAP: Final = {
+    MASTER_FAIL_STANDBY: "standby",
+    MASTER_FAIL_NO_ACTION: "no_action",
+}
