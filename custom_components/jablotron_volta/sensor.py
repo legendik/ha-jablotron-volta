@@ -62,7 +62,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     # Outdoor Temperatures
     JablotronVoltaSensorEntityDescription(
         key="outdoor_temp_damped",
-        translation_key="outdoor_temp_damped",
+        translation_key="outdoor_temperature_damped",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -70,7 +70,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     ),
     JablotronVoltaSensorEntityDescription(
         key="outdoor_temp_composite",
-        translation_key="outdoor_temp_composite",
+        translation_key="outdoor_temperature_composite",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -105,7 +105,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     # Boiler Water Temperatures
     JablotronVoltaSensorEntityDescription(
         key="boiler_water_input_temp",
-        translation_key="boiler_water_input_temp",
+        translation_key="boiler_water_input_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -113,7 +113,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     ),
     JablotronVoltaSensorEntityDescription(
         key="boiler_water_return_temp",
-        translation_key="boiler_water_return_temp",
+        translation_key="boiler_water_return_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -130,7 +130,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     # CH1 Water Temperatures
     JablotronVoltaSensorEntityDescription(
         key="ch1_water_input_temp",
-        translation_key="ch1_water_input_temp",
+        translation_key="ch1_water_input_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -138,7 +138,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     ),
     JablotronVoltaSensorEntityDescription(
         key="ch1_water_return_temp",
-        translation_key="ch1_water_return_temp",
+        translation_key="ch1_water_return_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -155,7 +155,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     # CH2 Water Temperatures (conditional)
     JablotronVoltaSensorEntityDescription(
         key="ch2_water_input_temp",
-        translation_key="ch2_water_input_temp",
+        translation_key="ch2_water_input_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -164,7 +164,7 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
     ),
     JablotronVoltaSensorEntityDescription(
         key="ch2_water_return_temp",
-        translation_key="ch2_water_return_temp",
+        translation_key="ch2_water_return_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,

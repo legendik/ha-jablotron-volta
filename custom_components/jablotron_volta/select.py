@@ -52,7 +52,7 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     ),
     JablotronVoltaSelectEntityDescription(
         key="outdoor_temp_source",
-        translation_key="outdoor_temp_source",
+        translation_key="outdoor_temperature_source",
         options_map=OUT_TEMP_SOURCE_MAP,
         register=REG_REGU_SOURCE_OUT_TEMPER,
         value_fn=lambda data: data.get("outdoor_temp_source"),

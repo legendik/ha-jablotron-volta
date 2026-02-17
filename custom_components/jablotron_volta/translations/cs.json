@@ -46,10 +46,10 @@
       "boiler_total_energy": {
         "name": "Total Heating Energy"
       },
-      "boiler_water_input_temp": {
+      "boiler_water_input_temperature": {
         "name": "Boiler Water Input Temp"
       },
-      "boiler_water_return_temp": {
+      "boiler_water_return_temperature": {
         "name": "Boiler Water Return Temp"
       },
       "boiler_water_setpoint": {
@@ -67,10 +67,10 @@
       "ch1_temperature_current": {
         "name": "CH1 Current Temperature"
       },
-      "ch1_water_input_temp": {
+      "ch1_water_input_temperature": {
         "name": "CH1 Water Input Temp"
       },
-      "ch1_water_return_temp": {
+      "ch1_water_return_temperature": {
         "name": "CH1 Water Return Temp"
       },
       "ch1_water_setpoint": {
@@ -88,10 +88,10 @@
       "ch2_temperature_current": {
         "name": "CH2 Current Temperature"
       },
-      "ch2_water_input_temp": {
+      "ch2_water_input_temperature": {
         "name": "CH2 Water Input Temp"
       },
-      "ch2_water_return_temp": {
+      "ch2_water_return_temperature": {
         "name": "CH2 Water Return Temp"
       },
       "ch2_water_setpoint": {
@@ -109,10 +109,10 @@
       "ip_address": {
         "name": "IP Address"
       },
-      "outdoor_temp_composite": {
+      "outdoor_temperature_composite": {
         "name": "Outdoor Temp Composite"
       },
-      "outdoor_temp_damped": {
+      "outdoor_temperature_damped": {
         "name": "Outdoor Temp Damped"
       },
       "subnet_mask": {
@@ -135,7 +135,7 @@
       "master_fail_mode": {
         "name": "Master Fail Mode"
       },
-      "outdoor_temp_source": {
+      "outdoor_temperature_source": {
         "name": "Outdoor Temp Source"
       },
       "regulation_mode": {
@@ -143,19 +143,19 @@
       }
     },
     "number": {
-      "boiler_outdoor_temp_correction": {
+      "boiler_outdoor_temperature_correction": {
         "name": "Boiler Outdoor Temp Correction"
       },
-      "boiler_water_temp_max": {
+      "boiler_water_temperature_max": {
         "name": "Boiler Water Temp Max"
       },
-      "boiler_water_temp_min": {
+      "boiler_water_temperature_min": {
         "name": "Boiler Water Temp Min"
       },
       "building_momentum": {
         "name": "Building Momentum"
       },
-      "ch1_antifrost_temp": {
+      "ch1_antifrost_temperature": {
         "name": "CH1 Antifrost Temp"
       },
       "ch1_equitherm_offset": {
@@ -173,22 +173,22 @@
       "ch1_hysteresis": {
         "name": "CH1 Hysteresis"
       },
-      "ch1_limit_heat_temp": {
+      "ch1_limit_heat_temperature": {
         "name": "CH1 Limit Heat Temp"
       },
-      "ch1_temp_correction": {
+      "ch1_temperature_correction": {
         "name": "CH1 Temp Correction"
       },
       "ch1_threshold_setpoint": {
         "name": "CH1 Threshold Setpoint"
       },
-      "ch1_water_temp_max": {
+      "ch1_water_temperature_max": {
         "name": "CH1 Water Temp Max"
       },
-      "ch1_water_temp_min": {
+      "ch1_water_temperature_min": {
         "name": "CH1 Water Temp Min"
       },
-      "ch2_antifrost_temp": {
+      "ch2_antifrost_temperature": {
         "name": "CH2 Antifrost Temp"
       },
       "ch2_equitherm_offset": {
@@ -206,22 +206,22 @@
       "ch2_hysteresis": {
         "name": "CH2 Hysteresis"
       },
-      "ch2_limit_heat_temp": {
+      "ch2_limit_heat_temperature": {
         "name": "CH2 Limit Heat Temp"
       },
-      "ch2_temp_correction": {
+      "ch2_temperature_correction": {
         "name": "CH2 Temp Correction"
       },
       "ch2_threshold_setpoint": {
         "name": "CH2 Threshold Setpoint"
       },
-      "ch2_water_temp_max": {
+      "ch2_water_temperature_max": {
         "name": "CH2 Water Temp Max"
       },
-      "ch2_water_temp_min": {
+      "ch2_water_temperature_min": {
         "name": "CH2 Water Temp Min"
       },
-      "changeover_temp": {
+      "changeover_temperature": {
         "name": "Changeover Temp"
       },
       "composite_filter_ratio": {
@@ -230,7 +230,7 @@
       "dhw_hysteresis": {
         "name": "DHW Hysteresis"
       },
-      "outdoor_temp_manual": {
+      "outdoor_temperature_manual": {
         "name": "Outdoor Temp Manual"
       }
     },

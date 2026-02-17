@@ -88,7 +88,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="changeover_temp",
-        translation_key="changeover_temp",
+        translation_key="changeover_temperature",
         native_min_value=-20,
         native_max_value=30,
         native_step=0.5,
@@ -100,7 +100,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="outdoor_temp_manual",
-        translation_key="outdoor_temp_manual",
+        translation_key="outdoor_temperature_manual",
         native_min_value=-40,
         native_max_value=50,
         native_step=0.5,
@@ -113,7 +113,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     # Boiler Settings
     JablotronVoltaNumberEntityDescription(
         key="boiler_outdoor_temp_correction",
-        translation_key="boiler_outdoor_temp_correction",
+        translation_key="boiler_outdoor_temperature_correction",
         native_min_value=-10,
         native_max_value=10,
         native_step=0.5,
@@ -125,7 +125,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="boiler_water_temp_max",
-        translation_key="boiler_water_temp_max",
+        translation_key="boiler_water_temperature_max",
         native_min_value=30,
         native_max_value=90,
         native_step=1,
@@ -137,7 +137,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="boiler_water_temp_min",
-        translation_key="boiler_water_temp_min",
+        translation_key="boiler_water_temperature_min",
         native_min_value=10,
         native_max_value=60,
         native_step=1,
@@ -163,7 +163,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     # CH1 Settings
     JablotronVoltaNumberEntityDescription(
         key="ch1_antifrost_temp",
-        translation_key="ch1_antifrost_temp",
+        translation_key="ch1_antifrost_temperature",
         native_min_value=5,
         native_max_value=15,
         native_step=0.5,
@@ -187,7 +187,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_water_temp_min",
-        translation_key="ch1_water_temp_min",
+        translation_key="ch1_water_temperature_min",
         native_min_value=10,
         native_max_value=50,
         native_step=1,
@@ -199,7 +199,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_water_temp_max",
-        translation_key="ch1_water_temp_max",
+        translation_key="ch1_water_temperature_max",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -258,7 +258,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_limit_heat_temp",
-        translation_key="ch1_limit_heat_temp",
+        translation_key="ch1_limit_heat_temperature",
         native_min_value=0,
         native_max_value=10,
         native_step=0.5,
@@ -270,7 +270,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_temp_correction",
-        translation_key="ch1_temp_correction",
+        translation_key="ch1_temperature_correction",
         native_min_value=-5,
         native_max_value=5,
         native_step=0.5,
@@ -295,7 +295,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     # CH2 Settings (conditional)
     JablotronVoltaNumberEntityDescription(
         key="ch2_antifrost_temp",
-        translation_key="ch2_antifrost_temp",
+        translation_key="ch2_antifrost_temperature",
         native_min_value=5,
         native_max_value=15,
         native_step=0.5,
@@ -321,7 +321,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_min",
-        translation_key="ch2_water_temp_min",
+        translation_key="ch2_water_temperature_min",
         native_min_value=10,
         native_max_value=50,
         native_step=1,
@@ -334,7 +334,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_max",
-        translation_key="ch2_water_temp_max",
+        translation_key="ch2_water_temperature_max",
         native_min_value=20,
         native_max_value=90,
         native_step=1,
@@ -398,7 +398,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_limit_heat_temp",
-        translation_key="ch2_limit_heat_temp",
+        translation_key="ch2_limit_heat_temperature",
         native_min_value=0,
         native_max_value=10,
         native_step=0.5,
@@ -411,7 +411,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_temp_correction",
-        translation_key="ch2_temp_correction",
+        translation_key="ch2_temperature_correction",
         native_min_value=-5,
         native_max_value=5,
         native_step=0.5,
