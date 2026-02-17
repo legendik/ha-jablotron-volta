@@ -128,17 +128,12 @@ class JablotronModbusClient:
     def read_holding_registers(
         self, address: int, count: int = 1
     ) -> list[int] | None:
-        """Read holding registers (configuration data)."""
+        """Read holding registers (configuration data).
+        
+        Note: Authentication must be performed before calling this method.
+        Use authenticate_system_access() before reading holding registers.
+        """
         try:
-            # Holding registers (1000-3999) require authentication even for reading
-            if 1000 <= address <= 3999:
-                if not self.authenticate_system_access():
-                    _LOGGER.error(
-                        "Failed to authenticate before reading holding registers at %s",
-                        address,
-                    )
-                    return None
-            
             _LOGGER.debug(
                 "Reading holding registers: address=%s, count=%s, device_id=%s",
                 address,
@@ -233,6 +228,11 @@ class JablotronModbusClient:
         """Read all relevant data from the device in batched operations."""
         data: dict[str, Any] = {}
 
+        # Authenticate once at the beginning for all holding register reads
+        # This prevents authentication from being called multiple times
+        if not self.authenticate_system_access():
+            _LOGGER.error("Failed to authenticate, holding registers may not be readable")
+
         # Batch 1: Device info and system status (input registers 1-49)
         # This includes: serial, device_id, hw_rev, mac, fw_rev, ip, cpu_temp,
         # battery, regulation, and boiler status
@@ -299,11 +299,10 @@ class JablotronModbusClient:
                 data["ch2_settings"] = batch10
 
         # Batch 11: System control registers (holding registers 3001-3010)
-        # These require authentication
-        if self.authenticate_system_access():
-            batch11 = self.read_holding_registers(3001, 10)
-            if batch11:
-                data["system_control"] = batch11
+        # Already authenticated at the beginning
+        batch11 = self.read_holding_registers(3001, 10)
+        if batch11:
+            data["system_control"] = batch11
 
         return data
 
