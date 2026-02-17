@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.3...jablotron-volta-v1.1.4) (2026-02-17)
+
+
+### Bug Fixes
+
+* authenticate immediately after connection instead of before each read ([101ded3](https://github.com/legendik/ha-jablotron-volta/commit/101ded31bb685c5505f19d1a1672c8cbfebd3145))
+
 ## [1.1.3](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.2...jablotron-volta-v1.1.3) (2026-02-17)
 
 
