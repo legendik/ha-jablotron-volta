@@ -13,7 +13,7 @@ views:
     cards:
       # Climate Control
       - type: thermostat
-        entity: climate.heating_circuit_1
+        entity: climate.jablotron_volta_heating_circuit_1
         name: Kotel Volta
 
       # Hlavní teploty
