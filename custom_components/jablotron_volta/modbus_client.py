@@ -33,17 +33,21 @@ class JablotronModbusClient:
     def connect(self) -> bool:
         """Connect to the Modbus device."""
         try:
+            _LOGGER.info("Connecting to Modbus device at %s:%s", self.host, self.port)
             result = self._client.connect()
             if result:
-                _LOGGER.debug("Successfully connected to %s:%s", self.host, self.port)
+                _LOGGER.info("Successfully connected to %s:%s", self.host, self.port)
                 # Authenticate immediately after connection
                 # This is required for reading/writing holding registers
                 if not self.authenticate_system_access():
                     _LOGGER.error("Failed to authenticate after connection")
                     return False
+                _LOGGER.info("Connection and authentication complete")
+            else:
+                _LOGGER.error("Connection failed (result was False)")
             return result
         except Exception as err:
-            _LOGGER.error("Connection failed to %s:%s - %s", self.host, self.port, err)
+            _LOGGER.error("Connection failed to %s:%s - %s", self.host, self.port, err, exc_info=True)
             return False
 
     def close(self) -> None:
@@ -58,27 +62,35 @@ class JablotronModbusClient:
     def authenticate_system_access(self) -> bool:
         """Authenticate for system register access (password 5586)."""
         if self._authenticated:
+            _LOGGER.debug("Already authenticated, skipping")
             return True
 
         try:
             # Write password directly without calling write_register to avoid recursion
-            _LOGGER.debug("Authenticating with password to register 3001")
+            _LOGGER.info("Authenticating with password %s to register 3001", SYSTEM_PASSWORD)
             result = self._client.write_register(
                 3001,
                 SYSTEM_PASSWORD,
                 device_id=self.device_id
             )
             
+            _LOGGER.info("Authentication result: %s (type: %s)", result, type(result))
+            
             # Check for errors
             if hasattr(result, 'isError') and result.isError():
-                _LOGGER.warning("System authentication failed: %s", result)
+                _LOGGER.error("System authentication failed with error: %s", result)
+                return False
+            
+            # Check if result indicates success
+            if not hasattr(result, 'function_code'):
+                _LOGGER.error("Unexpected authentication response format: %s", result)
                 return False
             
             self._authenticated = True
-            _LOGGER.debug("System authentication successful")
+            _LOGGER.info("System authentication successful!")
             return True
         except Exception as err:
-            _LOGGER.error("Authentication error: %s", err)
+            _LOGGER.error("Authentication exception: %s", err, exc_info=True)
             return False
 
     def read_input_registers(
@@ -236,11 +248,21 @@ class JablotronModbusClient:
         # Authentication is already done in connect() method
         # No need to authenticate again here
 
-        # Batch 1: Device info and system status (input registers 1-49)
-        # This includes: serial, device_id, hw_rev, mac, fw_rev, ip, cpu_temp,
-        # battery, regulation, and boiler status
-        batch1 = self.read_input_registers(1, 49)
-        if batch1:
+        # Batch 1: Device info and system status (input registers)
+        # Note: Not all registers exist - we read in chunks to avoid gaps
+        
+        # 1-17: Serial, device ID, HW/FW versions, MAC, IP
+        batch1a = self.read_input_registers(1, 17)
+        # 20-21: System info
+        batch1b = self.read_input_registers(20, 2)
+        # 30-32: Regulation info
+        batch1c = self.read_input_registers(30, 3)
+        # 40-49: Boiler status
+        batch1d = self.read_input_registers(40, 10)
+        
+        if batch1a and batch1b and batch1c and batch1d:
+            # Combine with gaps filled as zeros
+            batch1 = batch1a + [0, 0] + batch1b + [0] * 8 + batch1c + [0] * 7 + batch1d
             data["device_info"] = batch1[0:11]
             data["network_info"] = batch1[11:17]
             data["system_status"] = batch1[19:21]
@@ -268,26 +290,49 @@ class JablotronModbusClient:
             else:
                 data["ch2_available"] = False
 
-        # Batch 5: System alerts and ethernet config (holding registers 1001-1018)
-        batch5 = self.read_holding_registers(1001, 18)
-        if batch5:
-            data["system_alerts"] = batch5[0:2]
-            data["ethernet_config"] = batch5[9:18]
+        # Batch 5a: System alerts (holding registers 1001-1002)
+        batch5a = self.read_holding_registers(1001, 2)
+        if batch5a:
+            data["system_alerts"] = batch5a
+        
+        # Batch 5b: Ethernet config (holding registers 1010-1018)
+        batch5b = self.read_holding_registers(1010, 9)
+        if batch5b:
+            data["ethernet_config"] = batch5b
 
-        # Batch 6: Regulation settings (holding registers 1030-1040)
-        batch6 = self.read_holding_registers(1030, 11)
-        if batch6:
-            data["regulation_settings"] = batch6
+        # Batch 6a: Regulation settings (holding registers 1030-1035)
+        batch6a = self.read_holding_registers(1030, 6)
+        if batch6a:
+            data["regulation_settings"] = batch6a
+        
+        # Batch 6b: Regulation setting (holding register 1040)
+        batch6b = self.read_holding_registers(1040, 1)
+        if batch6b:
+            # Append to regulation_settings if it exists
+            if "regulation_settings" in data:
+                data["regulation_settings"].extend([0, 0, 0, 0])  # Fill gaps 1036-1039
+                data["regulation_settings"].extend(batch6b)  # Add 1040
+            else:
+                data["regulation_settings"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] + batch6b
 
         # Batch 7: Boiler settings (holding registers 1050-1062)
         batch7 = self.read_holding_registers(1050, 13)
         if batch7:
             data["boiler_settings"] = batch7
 
-        # Batch 8: DHW settings (holding registers 1100-1107)
-        batch8 = self.read_holding_registers(1100, 8)
-        if batch8:
-            data["dhw_settings"] = batch8
+        # Batch 8a: DHW settings (holding registers 1100-1104)
+        batch8a = self.read_holding_registers(1100, 5)
+        if batch8a:
+            data["dhw_settings"] = batch8a
+        
+        # Batch 8b: DHW settings (holding registers 1106-1107)
+        batch8b = self.read_holding_registers(1106, 2)
+        if batch8b:
+            if "dhw_settings" in data:
+                data["dhw_settings"].append(0)  # Fill gap at 1105
+                data["dhw_settings"].extend(batch8b)  # Add 1106-1107
+            else:
+                data["dhw_settings"] = [0, 0, 0, 0, 0, 0] + batch8b
 
         # Batch 9: CH1 settings (holding registers 1200-1219)
         batch9 = self.read_holding_registers(1200, 20)
