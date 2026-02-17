@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.1...jablotron-volta-v1.1.2) (2026-02-17)
+
+
+### Bug Fixes
+
+* login before reading holding registers ([c9c4a6d](https://github.com/legendik/ha-jablotron-volta/commit/c9c4a6df469460cd4a564afb00c095022db92c5a))
+
 ## [1.1.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.0...jablotron-volta-v1.1.1) (2026-02-17)
 
 
