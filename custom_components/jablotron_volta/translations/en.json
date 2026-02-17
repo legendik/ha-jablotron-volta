@@ -19,5 +19,267 @@
     "abort": {
       "already_configured": "Device is already configured"
     }
+  },
+  "entity": {
+    "sensor": {
+      "battery_voltage": {
+        "name": "Battery Voltage"
+      },
+      "boiler_active_segments": {
+        "name": "Boiler Active Segments"
+      },
+      "boiler_heating_power": {
+        "name": "Boiler Heating Power"
+      },
+      "boiler_inactive_segments": {
+        "name": "Boiler Inactive Segments"
+      },
+      "boiler_pressure": {
+        "name": "Boiler Pressure"
+      },
+      "boiler_pump_power": {
+        "name": "Boiler Pump Power"
+      },
+      "boiler_pwm_value": {
+        "name": "Boiler PWM Value"
+      },
+      "boiler_total_energy": {
+        "name": "Total Heating Energy"
+      },
+      "boiler_water_input_temp": {
+        "name": "Boiler Water Input Temperature"
+      },
+      "boiler_water_return_temp": {
+        "name": "Boiler Water Return Temperature"
+      },
+      "boiler_water_setpoint": {
+        "name": "Boiler Water Setpoint"
+      },
+      "ch1_co2": {
+        "name": "CH1 CO2"
+      },
+      "ch1_humidity": {
+        "name": "CH1 Humidity"
+      },
+      "ch1_pump_power": {
+        "name": "CH1 Pump Power"
+      },
+      "ch1_temperature_current": {
+        "name": "CH1 Current Room Temperature"
+      },
+      "ch1_water_input_temp": {
+        "name": "CH1 Water Input Temperature"
+      },
+      "ch1_water_return_temp": {
+        "name": "CH1 Water Return Temperature"
+      },
+      "ch1_water_setpoint": {
+        "name": "CH1 Water Setpoint"
+      },
+      "ch2_co2": {
+        "name": "CH2 CO2"
+      },
+      "ch2_humidity": {
+        "name": "CH2 Humidity"
+      },
+      "ch2_pump_power": {
+        "name": "CH2 Pump Power"
+      },
+      "ch2_temperature_current": {
+        "name": "CH2 Current Room Temperature"
+      },
+      "ch2_water_input_temp": {
+        "name": "CH2 Water Input Temperature"
+      },
+      "ch2_water_return_temp": {
+        "name": "CH2 Water Return Temperature"
+      },
+      "ch2_water_setpoint": {
+        "name": "CH2 Water Setpoint"
+      },
+      "cpu_temperature": {
+        "name": "CPU Temperature"
+      },
+      "dhw_temperature_current": {
+        "name": "DHW Current Temperature"
+      },
+      "gateway": {
+        "name": "Gateway"
+      },
+      "ip_address": {
+        "name": "IP Address"
+      },
+      "outdoor_temp_composite": {
+        "name": "Outdoor Temperature (Composite)"
+      },
+      "outdoor_temp_damped": {
+        "name": "Outdoor Temperature (Damped)"
+      },
+      "subnet_mask": {
+        "name": "Subnet Mask"
+      }
+    },
+    "select": {
+      "ch1_regulation_strategy": {
+        "name": "CH1 Regulation Strategy"
+      },
+      "ch2_regulation_strategy": {
+        "name": "CH2 Regulation Strategy"
+      },
+      "control_mode": {
+        "name": "Control Mode"
+      },
+      "dhw_regulation_strategy": {
+        "name": "DHW Regulation Strategy"
+      },
+      "master_fail_mode": {
+        "name": "Master Fail Mode"
+      },
+      "outdoor_temp_source": {
+        "name": "Outdoor Temperature Source"
+      },
+      "regulation_mode": {
+        "name": "Regulation Mode"
+      }
+    },
+    "number": {
+      "boiler_outdoor_temp_correction": {
+        "name": "Boiler Outdoor Temperature Correction"
+      },
+      "boiler_water_temp_max": {
+        "name": "Boiler Water Temperature Max"
+      },
+      "boiler_water_temp_min": {
+        "name": "Boiler Water Temperature Min"
+      },
+      "building_momentum": {
+        "name": "Building Momentum"
+      },
+      "ch1_antifrost_temp": {
+        "name": "CH1 Antifrost Temperature"
+      },
+      "ch1_equitherm_offset": {
+        "name": "CH1 Equitherm Offset"
+      },
+      "ch1_equitherm_room_effect": {
+        "name": "CH1 Equitherm Room Effect"
+      },
+      "ch1_equitherm_slope": {
+        "name": "CH1 Equitherm Slope"
+      },
+      "ch1_humidity_correction": {
+        "name": "CH1 Humidity Correction"
+      },
+      "ch1_hysteresis": {
+        "name": "CH1 Hysteresis"
+      },
+      "ch1_limit_heat_temp": {
+        "name": "CH1 Limit Heat Temperature"
+      },
+      "ch1_temp_correction": {
+        "name": "CH1 Temperature Correction"
+      },
+      "ch1_threshold_setpoint": {
+        "name": "CH1 Threshold Setpoint"
+      },
+      "ch1_water_temp_max": {
+        "name": "CH1 Water Temperature Max"
+      },
+      "ch1_water_temp_min": {
+        "name": "CH1 Water Temperature Min"
+      },
+      "ch2_antifrost_temp": {
+        "name": "CH2 Antifrost Temperature"
+      },
+      "ch2_equitherm_offset": {
+        "name": "CH2 Equitherm Offset"
+      },
+      "ch2_equitherm_room_effect": {
+        "name": "CH2 Equitherm Room Effect"
+      },
+      "ch2_equitherm_slope": {
+        "name": "CH2 Equitherm Slope"
+      },
+      "ch2_humidity_correction": {
+        "name": "CH2 Humidity Correction"
+      },
+      "ch2_hysteresis": {
+        "name": "CH2 Hysteresis"
+      },
+      "ch2_limit_heat_temp": {
+        "name": "CH2 Limit Heat Temperature"
+      },
+      "ch2_temp_correction": {
+        "name": "CH2 Temperature Correction"
+      },
+      "ch2_threshold_setpoint": {
+        "name": "CH2 Threshold Setpoint"
+      },
+      "ch2_water_temp_max": {
+        "name": "CH2 Water Temperature Max"
+      },
+      "ch2_water_temp_min": {
+        "name": "CH2 Water Temperature Min"
+      },
+      "changeover_temp": {
+        "name": "Changeover Temperature"
+      },
+      "composite_filter_ratio": {
+        "name": "Composite Filter Ratio"
+      },
+      "dhw_hysteresis": {
+        "name": "DHW Hysteresis"
+      },
+      "outdoor_temp_manual": {
+        "name": "Outdoor Temperature (Manual)"
+      }
+    },
+    "binary_sensor": {
+      "ch1_heating": {
+        "name": "CH1 Heating"
+      },
+      "ch2_heating": {
+        "name": "CH2 Heating"
+      },
+      "dhw_heating": {
+        "name": "DHW Heating"
+      },
+      "system_alert": {
+        "name": "System Alert"
+      }
+    },
+    "switch": {
+      "ch1_fast_cooldown": {
+        "name": "CH1 Fast Cooldown"
+      },
+      "ch1_optimal_start": {
+        "name": "CH1 Optimal Start"
+      },
+      "ch2_fast_cooldown": {
+        "name": "CH2 Fast Cooldown"
+      },
+      "ch2_optimal_start": {
+        "name": "CH2 Optimal Start"
+      }
+    },
+    "button": {
+      "reset_error": {
+        "name": "Reset Error"
+      },
+      "restart_device": {
+        "name": "Restart Device"
+      }
+    },
+    "climate": {
+      "dhw": {
+        "name": "DHW"
+      },
+      "ch1": {
+        "name": "Heating Circuit 1"
+      },
+      "ch2": {
+        "name": "Heating Circuit 2"
+      }
+    }
   }
 }

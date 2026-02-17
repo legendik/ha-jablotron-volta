@@ -1,0 +1,285 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Nastavení Jablotron Volta",
+        "description": "Zadejte připojovací údaje k vašemu zařízení Jablotron Volta",
+        "data": {
+          "host": "IP adresa",
+          "port": "Port",
+          "device_id": "ID zařízení (Modbus Slave ID)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nepodařilo se připojit k zařízení",
+      "cannot_read": "Připojeno, ale nelze načíst data ze zařízení",
+      "unknown": "Nastala neočekávaná chyba"
+    },
+    "abort": {
+      "already_configured": "Zařízení je již nakonfigurováno"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "battery_voltage": {
+        "name": "Napětí baterie"
+      },
+      "boiler_active_segments": {
+        "name": "Aktivní segmenty kotle"
+      },
+      "boiler_heating_power": {
+        "name": "Topný výkon kotle"
+      },
+      "boiler_inactive_segments": {
+        "name": "Neaktivní segmenty kotle"
+      },
+      "boiler_pressure": {
+        "name": "Tlak v kotli"
+      },
+      "boiler_pump_power": {
+        "name": "Výkon čerpadla kotle"
+      },
+      "boiler_pwm_value": {
+        "name": "PWM hodnota kotle"
+      },
+      "boiler_total_energy": {
+        "name": "Celková topná energie"
+      },
+      "boiler_water_input_temp": {
+        "name": "Teplota vstupní vody kotle"
+      },
+      "boiler_water_return_temp": {
+        "name": "Teplota vratné vody kotle"
+      },
+      "boiler_water_setpoint": {
+        "name": "Požadovaná teplota vody kotle"
+      },
+      "ch1_co2": {
+        "name": "OK1 CO2"
+      },
+      "ch1_humidity": {
+        "name": "OK1 Vlhkost"
+      },
+      "ch1_pump_power": {
+        "name": "OK1 Výkon čerpadla"
+      },
+      "ch1_temperature_current": {
+        "name": "OK1 Aktuální teplota místnosti"
+      },
+      "ch1_water_input_temp": {
+        "name": "OK1 Teplota vstupní vody"
+      },
+      "ch1_water_return_temp": {
+        "name": "OK1 Teplota vratné vody"
+      },
+      "ch1_water_setpoint": {
+        "name": "OK1 Požadovaná teplota vody"
+      },
+      "ch2_co2": {
+        "name": "OK2 CO2"
+      },
+      "ch2_humidity": {
+        "name": "OK2 Vlhkost"
+      },
+      "ch2_pump_power": {
+        "name": "OK2 Výkon čerpadla"
+      },
+      "ch2_temperature_current": {
+        "name": "OK2 Aktuální teplota místnosti"
+      },
+      "ch2_water_input_temp": {
+        "name": "OK2 Teplota vstupní vody"
+      },
+      "ch2_water_return_temp": {
+        "name": "OK2 Teplota vratné vody"
+      },
+      "ch2_water_setpoint": {
+        "name": "OK2 Požadovaná teplota vody"
+      },
+      "cpu_temperature": {
+        "name": "Teplota CPU"
+      },
+      "dhw_temperature_current": {
+        "name": "TUV Aktuální teplota"
+      },
+      "gateway": {
+        "name": "Brána"
+      },
+      "ip_address": {
+        "name": "IP adresa"
+      },
+      "outdoor_temp_composite": {
+        "name": "Venkovní teplota (kompozitní)"
+      },
+      "outdoor_temp_damped": {
+        "name": "Venkovní teplota (tlumená)"
+      },
+      "subnet_mask": {
+        "name": "Maska podsítě"
+      }
+    },
+    "select": {
+      "ch1_regulation_strategy": {
+        "name": "OK1 Strategie regulace"
+      },
+      "ch2_regulation_strategy": {
+        "name": "OK2 Strategie regulace"
+      },
+      "control_mode": {
+        "name": "Režim řízení"
+      },
+      "dhw_regulation_strategy": {
+        "name": "TUV Strategie regulace"
+      },
+      "master_fail_mode": {
+        "name": "Režim při selhání master"
+      },
+      "outdoor_temp_source": {
+        "name": "Zdroj venkovní teploty"
+      },
+      "regulation_mode": {
+        "name": "Režim regulace"
+      }
+    },
+    "number": {
+      "boiler_outdoor_temp_correction": {
+        "name": "Korekce venkovní teploty kotle"
+      },
+      "boiler_water_temp_max": {
+        "name": "Max. teplota vody kotle"
+      },
+      "boiler_water_temp_min": {
+        "name": "Min. teplota vody kotle"
+      },
+      "building_momentum": {
+        "name": "Setrvačnost budovy"
+      },
+      "ch1_antifrost_temp": {
+        "name": "OK1 Teplota antifreeze"
+      },
+      "ch1_equitherm_offset": {
+        "name": "OK1 Ekvitermní offset"
+      },
+      "ch1_equitherm_room_effect": {
+        "name": "OK1 Ekvitermní vliv místnosti"
+      },
+      "ch1_equitherm_slope": {
+        "name": "OK1 Ekvitermní sklon"
+      },
+      "ch1_humidity_correction": {
+        "name": "OK1 Korekce vlhkosti"
+      },
+      "ch1_hysteresis": {
+        "name": "OK1 Hystereze"
+      },
+      "ch1_limit_heat_temp": {
+        "name": "OK1 Limitní topná teplota"
+      },
+      "ch1_temp_correction": {
+        "name": "OK1 Korekce teploty"
+      },
+      "ch1_threshold_setpoint": {
+        "name": "OK1 Prahová hodnota"
+      },
+      "ch1_water_temp_max": {
+        "name": "OK1 Max. teplota vody"
+      },
+      "ch1_water_temp_min": {
+        "name": "OK1 Min. teplota vody"
+      },
+      "ch2_antifrost_temp": {
+        "name": "OK2 Teplota antifreeze"
+      },
+      "ch2_equitherm_offset": {
+        "name": "OK2 Ekvitermní offset"
+      },
+      "ch2_equitherm_room_effect": {
+        "name": "OK2 Ekvitermní vliv místnosti"
+      },
+      "ch2_equitherm_slope": {
+        "name": "OK2 Ekvitermní sklon"
+      },
+      "ch2_humidity_correction": {
+        "name": "OK2 Korekce vlhkosti"
+      },
+      "ch2_hysteresis": {
+        "name": "OK2 Hystereze"
+      },
+      "ch2_limit_heat_temp": {
+        "name": "OK2 Limitní topná teplota"
+      },
+      "ch2_temp_correction": {
+        "name": "OK2 Korekce teploty"
+      },
+      "ch2_threshold_setpoint": {
+        "name": "OK2 Prahová hodnota"
+      },
+      "ch2_water_temp_max": {
+        "name": "OK2 Max. teplota vody"
+      },
+      "ch2_water_temp_min": {
+        "name": "OK2 Min. teplota vody"
+      },
+      "changeover_temp": {
+        "name": "Teplota přepnutí"
+      },
+      "composite_filter_ratio": {
+        "name": "Poměr kompozitního filtru"
+      },
+      "dhw_hysteresis": {
+        "name": "TUV Hystereze"
+      },
+      "outdoor_temp_manual": {
+        "name": "Venkovní teplota (manuální)"
+      }
+    },
+    "binary_sensor": {
+      "ch1_heating": {
+        "name": "OK1 Topení"
+      },
+      "ch2_heating": {
+        "name": "OK2 Topení"
+      },
+      "dhw_heating": {
+        "name": "TUV Ohřev"
+      },
+      "system_alert": {
+        "name": "Systémové upozornění"
+      }
+    },
+    "switch": {
+      "ch1_fast_cooldown": {
+        "name": "OK1 Rychlé chlazení"
+      },
+      "ch1_optimal_start": {
+        "name": "OK1 Optimální start"
+      },
+      "ch2_fast_cooldown": {
+        "name": "OK2 Rychlé chlazení"
+      },
+      "ch2_optimal_start": {
+        "name": "OK2 Optimální start"
+      }
+    },
+    "button": {
+      "reset_error": {
+        "name": "Reset chyby"
+      },
+      "restart_device": {
+        "name": "Restart zařízení"
+      }
+    },
+    "climate": {
+      "dhw": {
+        "name": "TUV"
+      },
+      "ch1": {
+        "name": "Topný okruh 1"
+      },
+      "ch2": {
+        "name": "Topný okruh 2"
+      }
+    }
+  }
+}
