@@ -148,8 +148,9 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
             reg = raw_data["regulation"]
             if len(reg) >= 3:
                 data["regulation_mode_current"] = reg[0]
-                data["outdoor_temp_damped"] = self.client.scale_temperature(reg[1])
-                data["outdoor_temp_composite"] = self.client.scale_temperature(reg[2])
+                # Outdoor temperatures can be negative, use signed conversion
+                data["outdoor_temp_damped"] = self.client.scale_signed_temperature(reg[1])
+                data["outdoor_temp_composite"] = self.client.scale_signed_temperature(reg[2])
 
         # Process boiler status
         if "boiler_status" in raw_data:
