@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.6...jablotron-volta-v1.2.0) (2026-02-17)
+
+
+### Features
+
+* add professional dashboard with 7 tabs ([c749c93](https://github.com/legendik/ha-jablotron-volta/commit/c749c93a2168d695531ec58ad9c6ce57b1eeb17c))
+
+
+### Bug Fixes
+
+* add device prefix for all entities ([ccf1352](https://github.com/legendik/ha-jablotron-volta/commit/ccf1352d10b544cc6310d0e364b568e8076cd4df))
+
 ## [1.1.6](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.1.5...jablotron-volta-v1.1.6) (2026-02-17)
 
 
