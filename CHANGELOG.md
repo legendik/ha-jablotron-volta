@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.2.1...jablotron-volta-v1.3.0) (2026-02-17)
+
+
+### Features
+
+* add entity name translations (EN + CS) ([fb62668](https://github.com/legendik/ha-jablotron-volta/commit/fb62668151b45eba7b8adef2aac4d3343b43d027))
+
 ## [1.2.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.2.0...jablotron-volta-v1.2.1) (2026-02-17)
 
 
