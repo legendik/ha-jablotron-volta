@@ -1,0 +1,358 @@
+
+title: Jablotron Volta
+views:
+  - title: Přehled
+    path: prehled
+    icon: mdi:home-thermometer
+    cards:
+      - type: thermostat
+        entity: climate.jablotron_volta_heating_circuit_1
+        name: Kotel Volta
+      - type: entities
+        title: 🌡️ Teploty
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Venkovní teplota (Composite)
+            icon: mdi:thermometer
+          - entity: sensor.jablotron_volta_outdoor_temperature_damped
+            name: Venkovní teplota (Tlumená)
+            icon: mdi:thermometer-lines
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
+            name: Teplota vody - vstup
+            icon: mdi:water-thermometer
+          - entity: sensor.jablotron_volta_boiler_water_return_temperature
+            name: Teplota vody - vratná
+            icon: mdi:water-thermometer-outline
+          - type: divider
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: CH1 - Požadovaná teplota vody
+            icon: mdi:target
+          - entity: sensor.jablotron_volta_ch1_current_room_temperature
+            name: CH1 - Aktuální teplota
+            icon: mdi:thermometer
+      - type: entities
+        title: ⚙️ Stav kotle
+        show_header_toggle: false
+        entities:
+          - entity: select.jablotron_volta_regulation_mode
+            name: Režim regulace
+            icon: mdi:cog
+          - entity: binary_sensor.jablotron_volta_ch1_heating
+            name: Vytápění aktivní
+            icon: mdi:fire
+          - entity: sensor.jablotron_volta_boiler_active_segments
+            name: Aktivní topné segmenty
+            icon: mdi:heating-coil
+          - entity: sensor.jablotron_volta_boiler_pressure
+            name: Tlak v systému
+            icon: mdi:gauge
+          - entity: sensor.jablotron_volta_cpu_temperature
+            name: Teplota CPU
+            icon: mdi:chip
+      - type: history-graph
+        title: 📈 Historie teplot (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Venkovní (Composite)
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
+            name: Voda - vstup
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: CH1 Setpoint
+  - title: Ekvitermní křivka
+    path: ekviterm
+    icon: mdi:chart-bell-curve
+    cards:
+      - type: markdown
+        content: |
+          ## 📊 Ekvitermní regulace
+
+          **Jak to funguje:**
+          - Kotel mění teplotu vody podle venkovní teploty
+          - **Slope** = Jak moc se mění (sklon křivky)
+          - **Offset** = Posun celé křivky nahoru/dolů
+          - **Composite Ratio** = Mix aktuální + tlumené teploty (0.5 = 50/50)
+
+          **Tvoje nastavení je optimalizované pro podlahové topení!**
+      - type: entities
+        title: ⚙️ Nastavení ekvitermní křivky
+        show_header_toggle: false
+        entities:
+          - entity: number.jablotron_volta_ch1_equitherm_slope
+            name: Sklon křivky (Slope)
+            icon: mdi:angle-acute
+          - entity: number.jablotron_volta_ch1_equitherm_offset
+            name: Posun křivky (Offset)
+            icon: mdi:arrow-up-down
+          - entity: number.jablotron_volta_composite_filter_ratio
+            name: Composite Filter Ratio
+            icon: mdi:filter
+      - type: entities
+        title: 🌡️ Venkovní teploty
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Composite (použito pro ekviterm)
+            icon: mdi:thermometer
+          - entity: sensor.jablotron_volta_outdoor_temperature_damped
+            name: Tlumená
+            icon: mdi:thermometer-lines
+          - type: divider
+          - entity: number.jablotron_volta_building_momentum
+            name: Konstanta setrvačnosti budovy
+            icon: mdi:timer-sand
+      - type: gauge
+        entity: sensor.jablotron_volta_ch1_water_setpoint
+        name: Výsledná teplota vody (CH1)
+        min: 20
+        max: 60
+        severity:
+          green: 30
+          yellow: 45
+          red: 55
+        needle: true
+      - type: history-graph
+        title: 📈 Ekvitermní regulace (48h)
+        hours_to_show: 48
+        refresh_interval: 300
+        entities:
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Venkovní (Composite)
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: Teplota vody
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
+            name: Voda vstup (skutečná)
+      - type: markdown
+        content: |
+          ### 💡 Tipy pro doladění:
+
+          **Je v zimě zima?**
+          - ❄️ Termostaty pořád otevřené, teplota nikdy nedosáhne cíle
+          - 🔧 **Zvyš Slope** na 0.7 nebo 0.8
+
+          **Je v přechodném období teplo?**
+          - 🌤️ Termostaty pořád zavřené, přehřívání
+          - 🔧 **Sniž Slope** na 0.5 nebo 0.4
+
+          **Celkově moc/málo topí?**
+          - 🔧 Uprav **Offset** (±5°C)
+  - title: Všechna nastavení
+    path: nastaveni
+    icon: mdi:tune
+    cards:
+      - type: markdown
+        content: >
+          ## ⚠️ Pokročilá nastavení
+
+
+          **Pozor!** Změna těchto parametrů může ovlivnit efektivitu a komfort
+          vytápění.
+
+
+          Pokud si nejsi jistý, použij doporučená nastavení z tabu **CH1 Topný
+          okruh**.
+      - type: entities
+        title: 📐 Regulace
+        show_header_toggle: false
+        entities:
+          - entity: number.jablotron_volta_building_momentum
+            name: Konstanta setrvačnosti budovy
+          - entity: number.jablotron_volta_composite_filter_ratio
+            name: Composite Filter Ratio
+      - type: entities
+        title: 🔥 CH1 - Kompletní nastavení
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Teploty
+          - entity: number.jablotron_volta_ch1_water_temperature_min
+            name: Min. teplota
+          - entity: number.jablotron_volta_ch1_water_temperature_max
+            name: Max. teplota
+          - entity: number.jablotron_volta_ch1_antifrost_temperature
+            name: Protimrazová teplota
+          - type: section
+            label: Voda
+          - entity: number.jablotron_volta_ch1_water_temperature_min
+            name: Min. teplota vody
+          - entity: number.jablotron_volta_ch1_water_temperature_max
+            name: Max. teplota vody
+          - type: section
+            label: Ekvitermní křivka
+          - entity: number.jablotron_volta_ch1_equitherm_slope
+            name: Slope
+          - entity: number.jablotron_volta_ch1_equitherm_offset
+            name: Offset
+          - entity: number.jablotron_volta_ch1_equitherm_room_effect
+            name: Room Effect
+          - type: section
+            label: Pokročilé
+          - entity: number.jablotron_volta_ch1_hysteresis
+            name: Hysteresis
+          - entity: number.jablotron_volta_ch1_temperature_correction
+            name: Korekce teploty
+          - entity: switch.jablotron_volta_ch1_optimal_start
+            name: Optimal Start/Stop
+      - type: entities
+        title: 🏭 Kotel
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_boiler_water_setpoint
+            name: Setpoint teploty vody
+          - entity: number.jablotron_volta_boiler_water_temperature_min
+            name: Min. teplota
+          - entity: number.jablotron_volta_boiler_water_temperature_max
+            name: Max. teplota
+      - type: entities
+        title: 🚿 TUV
+        show_header_toggle: false
+        entities:
+          - entity: number.jablotron_volta_dhw_hysteresis
+            name: Hysteresis
+  - title: CH1 Topný okruh
+    path: ch1
+    icon: mdi:radiator
+    cards:
+      - type: markdown
+        content: |
+          ## 🔥 CH1 - Topný okruh 1
+
+          **Režim:** Ekvitermní regulace
+          **Typ topení:** Podlahové topení
+          **Regulace místností:** Chytré termostaty na hlavicích
+      - type: entities
+        title: 📊 Aktuální stav
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_ch1_current_room_temperature
+            name: Aktuální teplota
+            icon: mdi:thermometer
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: Požadovaná teplota vody
+            icon: mdi:target
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
+            name: Teplota vody - vstup
+            icon: mdi:water-thermometer
+          - entity: sensor.jablotron_volta_ch1_water_return_temperature
+            name: Teplota vody - vratná
+            icon: mdi:water-thermometer-outline
+      - type: entities
+        title: 🎯 Nastavení TUV
+        show_header_toggle: false
+        entities:
+          - entity: number.jablotron_volta_dhw_hysteresis
+            name: Hysteresis
+            icon: mdi:sine-wave
+      - type: history-graph
+        title: 📈 Historie TUV (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.jablotron_volta_dhw_temperature_current
+            name: Teplota TUV
+      - type: gauge
+        entity: sensor.jablotron_volta_dhw_current_temperature
+        name: Teplota TUV
+        min: 0
+        max: 80
+        severity:
+          green: 45
+          yellow: 35
+          red: 70
+        needle: true
+  - title: Diagnostika
+    path: diagnostika
+    icon: mdi:bug
+    cards:
+      - type: markdown
+        content: |
+          ## 🔍 Diagnostika a debug
+
+          Zde najdeš podrobné informace pro ladění a diagnostiku systému.
+      - type: entities
+        title: 🌡️ Všechny teploty
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Venkovní
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Composite (použito pro ekviterm)
+          - entity: sensor.jablotron_volta_outdoor_temperature_damped
+            name: Tlumená
+          - type: section
+            label: Kotel
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
+            name: Vstup
+          - entity: sensor.jablotron_volta_boiler_water_return_temperature
+            name: Vratná
+          - entity: sensor.jablotron_volta_boiler_water_setpoint
+            name: Setpoint
+          - entity: sensor.jablotron_volta_cpu_temperature
+            name: CPU
+          - type: section
+            label: CH1
+          - entity: sensor.jablotron_volta_dhw_current_temperature
+            name: Aktuální
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: Setpoint vody
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
+            name: Voda vstup
+          - entity: sensor.jablotron_volta_ch1_water_return_temperature
+            name: Voda vratná
+          - type: section
+            label: TUV
+          - entity: sensor.jablotron_volta_dhw_current_temperature
+            name: Aktuální
+      - type: entities
+        title: 🔌 Modbus
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_ip_address
+            name: IP adresa
+            icon: mdi:ip-network
+      - type: entities
+        title: 💾 Systém
+        show_header_toggle: false
+        entities:
+          - entity: sensor.jablotron_volta_cpu_temperature
+            name: Teplota CPU
+          - entity: sensor.jablotron_volta_battery_voltage
+            name: Baterie
+          - entity: sensor.jablotron_volta_boiler_pressure
+            name: Tlak
+          - entity: sensor.jablotron_volta_boiler_active_segments
+            name: Aktivní segmenty
+          - entity: sensor.jablotron_volta_boiler_inactive_segments
+            name: Neaktivní segmenty
+      - type: history-graph
+        title: 📊 Všechny teploty (24h)
+        hours_to_show: 24
+        refresh_interval: 300
+        entities:
+          - entity: sensor.jablotron_volta_outdoor_temperature_composite
+            name: Venkovní
+          - entity: sensor.jablotron_volta_boiler_water_input_temperature
+            name: Kotel vstup
+          - entity: sensor.jablotron_volta_ch1_water_setpoint
+            name: CH1 setpoint
+          - entity: sensor.jablotron_volta_ch1_water_input_temperature
+            name: CH1 vstup
+          - entity: sensor.jablotron_volta_dhw_temperature_current
+            name: TUV
+      - type: markdown
+        content: >
+          ### 💡 Pro sledování spotřeby energie:
+
+
+          Pokud chceš sledovat spotřebu elektřiny kotle, připoj energetický
+          měřič
+
+          (např. Shelly EM) a přidej sem entity pro:
+
+          - Aktuální příkon (W)
+
+          - Denní spotřeba (kWh)
+
+          - Měsíční spotřeba (kWh)
