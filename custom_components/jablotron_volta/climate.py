@@ -70,8 +70,6 @@ class JablotronVoltaClimateBase(CoordinatorEntity, ClimateEntity):
 class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
     """Climate entity for Heating Circuit (CH1 or CH2)."""
 
-    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
-
     def __init__(
         self,
         coordinator: JablotronVoltaCoordinator,
@@ -80,6 +78,7 @@ class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
     ) -> None:
         """Initialize heating circuit climate entity."""
         super().__init__(coordinator, entry)
+        self._attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
         self._circuit = circuit_number
         self._attr_unique_id = f"{entry.entry_id}_ch{circuit_number}_climate"
         self._attr_translation_key = f"ch{circuit_number}"

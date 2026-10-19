@@ -98,14 +98,8 @@ class JablotronModbusClient:
             else:
                 _LOGGER.error("Connection failed (result was False)")
             return result
-        except Exception as err:
-            _LOGGER.error(
-                "Connection failed to %s:%s - %s",
-                self.host,
-                self.port,
-                err,
-                exc_info=True,
-            )
+        except Exception:
+            _LOGGER.exception("Connection failed to %s:%s", self.host, self.port)
             return False
 
     def close(self) -> None:
@@ -114,8 +108,8 @@ class JablotronModbusClient:
             self._client.close()
             self._authenticated = False
             _LOGGER.debug("Connection closed to %s:%s", self.host, self.port)
-        except Exception as err:
-            _LOGGER.error("Error closing connection: %s", err)
+        except Exception:
+            _LOGGER.exception("Error closing connection")
 
     def authenticate_system_access(self) -> bool:
         """Authenticate for system register access (password 5586)."""
@@ -147,8 +141,8 @@ class JablotronModbusClient:
             self._authenticated = True
             _LOGGER.info("System authentication successful!")
             return True
-        except Exception as err:
-            _LOGGER.error("Authentication exception: %s", err, exc_info=True)
+        except Exception:
+            _LOGGER.exception("Authentication exception")
             return False
 
     def read_input_registers(self, address: int, count: int = 1) -> list[int] | None:
@@ -196,8 +190,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading input registers: %s", err)
             return None
-        except Exception as err:
-            _LOGGER.exception("Unexpected error reading input registers: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error reading input registers")
             return None
 
     def read_holding_registers(self, address: int, count: int = 1) -> list[int] | None:
@@ -249,8 +243,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading holding registers: %s", err)
             return None
-        except Exception as err:
-            _LOGGER.exception("Unexpected error reading holding registers: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error reading holding registers")
             return None
 
     def write_register(self, address: int, value: int) -> bool:
@@ -258,13 +252,12 @@ class JablotronModbusClient:
         try:
             # Holding registers (1000-3999) require authentication
             # Authenticate before writing to any holding register
-            if 1000 <= address <= 3999:
-                if not self.authenticate_system_access():
-                    _LOGGER.error(
-                        "Failed to authenticate before writing to register %s",
-                        address,
-                    )
-                    return False
+            if 1000 <= address <= 3999 and not self.authenticate_system_access():
+                _LOGGER.error(
+                    "Failed to authenticate before writing to register %s",
+                    address,
+                )
+                return False
 
             _LOGGER.debug(
                 "Writing register: address=%s, value=%s, device_id=%s",
@@ -293,8 +286,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception writing register: %s", err)
             return False
-        except Exception as err:
-            _LOGGER.exception("Unexpected error writing register: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error writing register")
             return False
 
     def read_all_data(self) -> dict[str, Any]:
