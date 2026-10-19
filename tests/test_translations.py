@@ -63,8 +63,8 @@ def test_translation_keys_match_between_languages():
     en_keys = get_translation_keys_from_json("en")
     cs_keys = get_translation_keys_from_json("cs")
 
-    # Climate entities (ch1, ch2, dhw) are handled specially
-    climate_keys = {"ch1", "ch2", "dhw"}
+    # Climate entities (ch1, ch2) are handled specially
+    climate_keys = {"ch1", "ch2"}
 
     missing_in_cs = en_keys - cs_keys - climate_keys
     missing_in_en = cs_keys - en_keys - climate_keys

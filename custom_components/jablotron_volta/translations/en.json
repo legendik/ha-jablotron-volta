@@ -100,9 +100,6 @@
       "cpu_temperature": {
         "name": "CPU Temperature"
       },
-      "dhw_temperature_current": {
-        "name": "DHW Current Temperature"
-      },
       "gateway": {
         "name": "Gateway"
       },
@@ -128,9 +125,6 @@
       },
       "control_mode": {
         "name": "Control Mode"
-      },
-      "dhw_regulation_strategy": {
-        "name": "DHW Regulation Strategy"
       },
       "master_fail_mode": {
         "name": "Master Fail Mode"
@@ -227,9 +221,6 @@
       "composite_filter_ratio": {
         "name": "Composite Filter Ratio"
       },
-      "dhw_hysteresis": {
-        "name": "DHW Hysteresis"
-      },
       "outdoor_temperature_manual": {
         "name": "Outdoor Temperature (Manual)"
       }
@@ -240,9 +231,6 @@
       },
       "ch2_heating": {
         "name": "CH2 Heating"
-      },
-      "dhw_heating": {
-        "name": "DHW Heating"
       },
       "system_alert": {
         "name": "System Alert"
@@ -271,9 +259,6 @@
       }
     },
     "climate": {
-      "dhw": {
-        "name": "DHW"
-      },
       "ch1": {
         "name": "Heating Circuit 1"
       },

@@ -11,21 +11,53 @@ from pymodbus.exceptions import ModbusException
 from .const import SYSTEM_PASSWORD
 from .scaling import (
     ip_to_registers as _ip_to_registers,
+)
+from .scaling import (
     registers_to_ip as _registers_to_ip,
+)
+from .scaling import (
     registers_to_mac as _registers_to_mac,
+)
+from .scaling import (
     registers_to_uint32 as _registers_to_uint32,
+)
+from .scaling import (
     scale_percentage as _scale_percentage,
+)
+from .scaling import (
     scale_pressure as _scale_pressure,
+)
+from .scaling import (
     scale_ratio as _scale_ratio,
+)
+from .scaling import (
     scale_signed_percentage as _scale_signed_percentage,
+)
+from .scaling import (
     scale_signed_temperature as _scale_signed_temperature,
+)
+from .scaling import (
     scale_temperature as _scale_temperature,
+)
+from .scaling import (
     scale_voltage as _scale_voltage,
+)
+from .scaling import (
     unscale_percentage as _unscale_percentage,
+)
+from .scaling import (
     unscale_pressure as _unscale_pressure,
+)
+from .scaling import (
     unscale_ratio as _unscale_ratio,
+)
+from .scaling import (
     unscale_signed_temperature as _unscale_signed_temperature,
+)
+from .scaling import (
     unscale_temperature as _unscale_temperature,
+)
+from .scaling import (
     unscale_voltage as _unscale_voltage,
 )
 
@@ -66,14 +98,8 @@ class JablotronModbusClient:
             else:
                 _LOGGER.error("Connection failed (result was False)")
             return result
-        except Exception as err:
-            _LOGGER.error(
-                "Connection failed to %s:%s - %s",
-                self.host,
-                self.port,
-                err,
-                exc_info=True,
-            )
+        except Exception:
+            _LOGGER.exception("Connection failed to %s:%s", self.host, self.port)
             return False
 
     def close(self) -> None:
@@ -82,8 +108,8 @@ class JablotronModbusClient:
             self._client.close()
             self._authenticated = False
             _LOGGER.debug("Connection closed to %s:%s", self.host, self.port)
-        except Exception as err:
-            _LOGGER.error("Error closing connection: %s", err)
+        except Exception:
+            _LOGGER.exception("Error closing connection")
 
     def authenticate_system_access(self) -> bool:
         """Authenticate for system register access (password 5586)."""
@@ -115,8 +141,8 @@ class JablotronModbusClient:
             self._authenticated = True
             _LOGGER.info("System authentication successful!")
             return True
-        except Exception as err:
-            _LOGGER.error("Authentication exception: %s", err, exc_info=True)
+        except Exception:
+            _LOGGER.exception("Authentication exception")
             return False
 
     def read_input_registers(self, address: int, count: int = 1) -> list[int] | None:
@@ -164,8 +190,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading input registers: %s", err)
             return None
-        except Exception as err:
-            _LOGGER.exception("Unexpected error reading input registers: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error reading input registers")
             return None
 
     def read_holding_registers(self, address: int, count: int = 1) -> list[int] | None:
@@ -217,8 +243,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception reading holding registers: %s", err)
             return None
-        except Exception as err:
-            _LOGGER.exception("Unexpected error reading holding registers: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error reading holding registers")
             return None
 
     def write_register(self, address: int, value: int) -> bool:
@@ -226,13 +252,12 @@ class JablotronModbusClient:
         try:
             # Holding registers (1000-3999) require authentication
             # Authenticate before writing to any holding register
-            if 1000 <= address <= 3999:
-                if not self.authenticate_system_access():
-                    _LOGGER.error(
-                        "Failed to authenticate before writing to register %s",
-                        address,
-                    )
-                    return False
+            if 1000 <= address <= 3999 and not self.authenticate_system_access():
+                _LOGGER.error(
+                    "Failed to authenticate before writing to register %s",
+                    address,
+                )
+                return False
 
             _LOGGER.debug(
                 "Writing register: address=%s, value=%s, device_id=%s",
@@ -261,8 +286,8 @@ class JablotronModbusClient:
         except ModbusException as err:
             _LOGGER.error("Modbus exception writing register: %s", err)
             return False
-        except Exception as err:
-            _LOGGER.exception("Unexpected error writing register: %s", err)
+        except Exception:
+            _LOGGER.exception("Unexpected error writing register")
             return False
 
     def read_all_data(self) -> dict[str, Any]:
@@ -292,11 +317,6 @@ class JablotronModbusClient:
             data["system_status"] = batch1[19:21]
             data["regulation"] = batch1[29:32]
             data["boiler_status"] = batch1[39:49]
-
-        # Batch 2: DHW status (input registers 101-102)
-        batch2 = self.read_input_registers(101, 2)
-        if batch2:
-            data["dhw_status"] = batch2
 
         # Batch 3: CH1 status (input registers 200-206)
         batch3 = self.read_input_registers(200, 7)
@@ -343,20 +363,6 @@ class JablotronModbusClient:
         batch7 = self.read_holding_registers(1050, 13)
         if batch7:
             data["boiler_settings"] = batch7
-
-        # Batch 8a: DHW settings (holding registers 1100-1104)
-        batch8a = self.read_holding_registers(1100, 5)
-        if batch8a:
-            data["dhw_settings"] = batch8a
-
-        # Batch 8b: DHW settings (holding registers 1106-1107)
-        batch8b = self.read_holding_registers(1106, 2)
-        if batch8b:
-            if "dhw_settings" in data:
-                data["dhw_settings"].append(0)  # Fill gap at 1105
-                data["dhw_settings"].extend(batch8b)  # Add 1106-1107
-            else:
-                data["dhw_settings"] = [0, 0, 0, 0, 0, 0] + batch8b
 
         # Batch 9: CH1 settings (holding registers 1200-1219)
         batch9 = self.read_holding_registers(1200, 20)

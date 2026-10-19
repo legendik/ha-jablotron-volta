@@ -17,7 +17,6 @@ from custom_components.jablotron_volta.scaling import (
 
 from .conftest import _make_coordinator_data
 
-
 # ---------------------------------------------------------------------------
 # Descriptor-level validation (no fixtures needed)
 # ---------------------------------------------------------------------------
@@ -161,11 +160,6 @@ class TestNumberValueFunctions:
         n = self._get_number("boiler_water_temp_min")
         assert n.value_fn(self.data) == 30.0
 
-    # --- DHW ---
-    def test_dhw_hysteresis(self):
-        n = self._get_number("dhw_hysteresis")
-        assert n.value_fn(self.data) == 2.0
-
     # --- CH1 ---
     def test_ch1_antifrost_temp(self):
         n = self._get_number("ch1_antifrost_temp")
@@ -308,7 +302,6 @@ class TestNumberScaleFunctions:
         unsigned_temp_keys = [
             "boiler_water_temp_max",
             "boiler_water_temp_min",
-            "dhw_hysteresis",
             "ch1_antifrost_temp",
             "ch1_hysteresis",
             "ch1_water_temp_min",

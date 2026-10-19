@@ -7,15 +7,12 @@ No mocking needed — these are pure functions.
 
 from __future__ import annotations
 
-
 from custom_components.jablotron_volta.coordinator import (
     parse_boiler_settings,
     parse_boiler_status,
     parse_ch_settings,
     parse_ch_status,
     parse_device_info,
-    parse_dhw_settings,
-    parse_dhw_status,
     parse_network_info,
     parse_regulation,
     parse_regulation_settings,
@@ -117,23 +114,6 @@ class TestParseBoilerStatus:
         assert parse_boiler_status([1, 2, 3]) == {}
 
 
-class TestParseDhwStatus:
-    """Test parse_dhw_status."""
-
-    def test_heating(self):
-        result = parse_dhw_status([1, 485])
-        assert result["dhw_state_heat"] is True
-        assert result["dhw_temperature_current"] == 48.5
-
-    def test_not_heating(self):
-        result = parse_dhw_status([0, 500])
-        assert result["dhw_state_heat"] is False
-        assert result["dhw_temperature_current"] == 50.0
-
-    def test_too_short(self):
-        assert parse_dhw_status([1]) == {}
-
-
 class TestParseChStatus:
     """Test parse_ch_status for CH1 and CH2."""
 
@@ -218,26 +198,6 @@ class TestParseBoilerSettings:
 
     def test_too_short(self):
         assert parse_boiler_settings([1, 2]) == {}
-
-
-class TestParseDhwSettings:
-    """Test parse_dhw_settings."""
-
-    def test_normal(self):
-        # [mode, desired, min, max, manual, GAP, hysteresis, strategy]
-        regs = [1, 500, 350, 650, 500, 0, 20, 0]
-        result = parse_dhw_settings(regs)
-
-        assert result["dhw_mode"] == 1
-        assert result["dhw_temperature_desired"] == 50.0
-        assert result["dhw_temperature_min"] == 35.0
-        assert result["dhw_temperature_max"] == 65.0
-        assert result["dhw_temperature_manual"] == 50.0
-        assert result["dhw_hysteresis"] == 2.0
-        assert result["dhw_regulation_strategy"] == 0
-
-    def test_too_short(self):
-        assert parse_dhw_settings([1, 2, 3]) == {}
 
 
 class TestParseChSettings:
@@ -345,12 +305,10 @@ class TestProcessRawData:
             "system_status": [455, 33],
             "regulation": [2, 65511, 65518],
             "boiler_status": [3, 0, 15, 0, 550, 450, 800, 1000, 0, 50],
-            "dhw_status": [1, 485],
             "ch1_status": [0, 215, 400, 350, 300, 550, 4500],
             "system_alerts": [0, 0],
             "regulation_settings": [2, 1, 48, 5, 50, 65486],
             "boiler_settings": [0, 1, 0, 1234, 600, 800, 300, 0, 0, 0, 0, 0, 0],
-            "dhw_settings": [1, 500, 350, 650, 500, 0, 20, 0],
             "ch1_settings": [
                 2,
                 220,
@@ -381,7 +339,6 @@ class TestProcessRawData:
         assert result["cpu_temperature"] == 45.5
         assert result["outdoor_temp_damped"] == -2.5
         assert result["boiler_pressure"] == 1.5
-        assert result["dhw_state_heat"] is True
         assert result["ch1_temperature_current"] == 21.5
         assert result["system_attention"] == 0
         assert result["ch1_equitherm_offset"] == -2.0

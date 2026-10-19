@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.data_entry_flow import FlowResult
@@ -75,15 +74,15 @@ class JablotronVoltaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 else:
                     errors["base"] = "cannot_connect"
 
-            except Exception as err:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception during setup: %s", err)
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception during setup")
                 errors["base"] = "unknown"
             finally:
                 # Ensure connection is closed
                 try:
                     await self.hass.async_add_executor_job(client.close)
                 except Exception:  # pylint: disable=broad-except
-                    pass
+                    _LOGGER.debug("Failed to close connection", exc_info=True)
 
         return self.async_show_form(
             step_id="user",

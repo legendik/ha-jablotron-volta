@@ -205,12 +205,6 @@ views:
             name: Min. teplota
           - entity: number.jablotron_volta_boiler_water_temperature_max
             name: Max. teplota
-      - type: entities
-        title: 🚿 TUV
-        show_header_toggle: false
-        entities:
-          - entity: number.jablotron_volta_dhw_hysteresis
-            name: Hysteresis
   - title: CH1 Topný okruh
     path: ch1
     icon: mdi:radiator
@@ -238,30 +232,6 @@ views:
           - entity: sensor.jablotron_volta_ch1_water_return_temperature
             name: Teplota vody - vratná
             icon: mdi:water-thermometer-outline
-      - type: entities
-        title: 🎯 Nastavení TUV
-        show_header_toggle: false
-        entities:
-          - entity: number.jablotron_volta_dhw_hysteresis
-            name: Hysteresis
-            icon: mdi:sine-wave
-      - type: history-graph
-        title: 📈 Historie TUV (24h)
-        hours_to_show: 24
-        refresh_interval: 300
-        entities:
-          - entity: sensor.jablotron_volta_dhw_temperature_current
-            name: Teplota TUV
-      - type: gauge
-        entity: sensor.jablotron_volta_dhw_current_temperature
-        name: Teplota TUV
-        min: 0
-        max: 80
-        severity:
-          green: 45
-          yellow: 35
-          red: 70
-        needle: true
   - title: Diagnostika
     path: diagnostika
     icon: mdi:bug
@@ -293,18 +263,12 @@ views:
             name: CPU
           - type: section
             label: CH1
-          - entity: sensor.jablotron_volta_dhw_current_temperature
-            name: Aktuální
           - entity: sensor.jablotron_volta_ch1_water_setpoint
             name: Setpoint vody
           - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: Voda vstup
           - entity: sensor.jablotron_volta_ch1_water_return_temperature
             name: Voda vratná
-          - type: section
-            label: TUV
-          - entity: sensor.jablotron_volta_dhw_current_temperature
-            name: Aktuální
       - type: entities
         title: 🔌 Modbus
         show_header_toggle: false
@@ -339,8 +303,6 @@ views:
             name: CH1 setpoint
           - entity: sensor.jablotron_volta_ch1_water_input_temperature
             name: CH1 vstup
-          - entity: sensor.jablotron_volta_dhw_temperature_current
-            name: TUV
       - type: markdown
         content: >
           ### 💡 Pro sledování spotřeby energie:

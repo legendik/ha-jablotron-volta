@@ -20,16 +20,11 @@ from .const import (
     CH_MODE_MANUAL,
     CH_MODE_SCHEDULE,
     CH_MODE_STANDBY,
-    DHW_MODE_MANUAL,
-    DHW_MODE_SCHEDULE,
-    DHW_MODE_STANDBY,
     DOMAIN,
     REG_CH1_MODE,
     REG_CH1_TEMPER_MANUAL,
     REG_CH2_MODE,
     REG_CH2_TEMPER_MANUAL,
-    REG_DHW_MODE,
-    REG_DHW_TEMPER_MANUAL,
 )
 from .coordinator import JablotronVoltaCoordinator
 
@@ -45,7 +40,6 @@ async def async_setup_entry(
     coordinator: JablotronVoltaCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     entities: list[ClimateEntity] = [
-        JablotronVoltaDHWClimate(coordinator, entry),
         JablotronVoltaHeatingCircuitClimate(coordinator, entry, 1),
     ]
 
@@ -73,104 +67,8 @@ class JablotronVoltaClimateBase(CoordinatorEntity, ClimateEntity):
         self._attr_device_info = coordinator.device_info
 
 
-class JablotronVoltaDHWClimate(JablotronVoltaClimateBase):
-    """Climate entity for Domestic Hot Water (DHW)."""
-
-    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
-
-    def __init__(
-        self,
-        coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
-    ) -> None:
-        """Initialize DHW climate entity."""
-        super().__init__(coordinator, entry)
-        self._attr_unique_id = f"{entry.entry_id}_dhw_climate"
-        self._attr_translation_key = "dhw"
-
-    @property
-    def current_temperature(self) -> float | None:
-        """Return the current temperature."""
-        return self.coordinator.data.get("dhw_temperature_current")
-
-    @property
-    def target_temperature(self) -> float | None:
-        """Return the target temperature."""
-        return self.coordinator.data.get("dhw_temperature_desired")
-
-    @property
-    def min_temp(self) -> float:
-        """Return the minimum temperature."""
-        return self.coordinator.data.get("dhw_temperature_min", 30.0)
-
-    @property
-    def max_temp(self) -> float:
-        """Return the maximum temperature."""
-        return self.coordinator.data.get("dhw_temperature_max", 70.0)
-
-    @property
-    def hvac_mode(self) -> HVACMode:
-        """Return current HVAC mode."""
-        mode = self.coordinator.data.get("dhw_mode")
-        if mode == DHW_MODE_STANDBY:
-            return HVACMode.OFF
-        elif mode == DHW_MODE_MANUAL:
-            return HVACMode.HEAT
-        elif mode == DHW_MODE_SCHEDULE:
-            return HVACMode.AUTO
-        return HVACMode.OFF
-
-    async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
-        """Set new HVAC mode."""
-        mode_value = DHW_MODE_STANDBY
-        if hvac_mode == HVACMode.HEAT:
-            mode_value = DHW_MODE_MANUAL
-        elif hvac_mode == HVACMode.AUTO:
-            mode_value = DHW_MODE_SCHEDULE
-
-        success = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            REG_DHW_MODE,
-            mode_value,
-        )
-
-        if success:
-            await self.coordinator.async_request_refresh()
-        else:
-            _LOGGER.error("Failed to set DHW HVAC mode to %s", hvac_mode)
-
-    async def async_set_temperature(self, **kwargs: Any) -> None:
-        """Set new target temperature."""
-        if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
-            return
-
-        # Write to manual temperature register
-        temp_value = self.coordinator.client.unscale_temperature(temperature)
-
-        success = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            REG_DHW_TEMPER_MANUAL,
-            temp_value,
-        )
-
-        if success:
-            await self.coordinator.async_request_refresh()
-        else:
-            _LOGGER.error("Failed to set DHW temperature to %s", temperature)
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return additional state attributes."""
-        return {
-            "regulation_strategy": self.coordinator.data.get("dhw_regulation_strategy"),
-            "hysteresis": self.coordinator.data.get("dhw_hysteresis"),
-        }
-
-
 class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
     """Climate entity for Heating Circuit (CH1 or CH2)."""
-
-    _attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
 
     def __init__(
         self,
@@ -180,6 +78,7 @@ class JablotronVoltaHeatingCircuitClimate(JablotronVoltaClimateBase):
     ) -> None:
         """Initialize heating circuit climate entity."""
         super().__init__(coordinator, entry)
+        self._attr_hvac_modes = [HVACMode.OFF, HVACMode.HEAT, HVACMode.AUTO]
         self._circuit = circuit_number
         self._attr_unique_id = f"{entry.entry_id}_ch{circuit_number}_climate"
         self._attr_translation_key = f"ch{circuit_number}"

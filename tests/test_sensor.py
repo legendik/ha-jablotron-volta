@@ -13,7 +13,6 @@ from custom_components.jablotron_volta.sensor import (
 
 from .conftest import _make_coordinator_data
 
-
 # ---------------------------------------------------------------------------
 # Descriptor-level validation (no fixtures needed)
 # ---------------------------------------------------------------------------
@@ -193,11 +192,6 @@ class TestSensorValueFunctions:
     def test_boiler_inactive_segments(self):
         s = self._get_sensor("boiler_inactive_segments")
         assert s.value_fn(self.data) == 0
-
-    # --- DHW ---
-    def test_dhw_temperature_current(self):
-        s = self._get_sensor("dhw_temperature_current")
-        assert s.value_fn(self.data) == 48.5
 
     # --- CH1 ---
     def test_ch1_temperature_current(self):
