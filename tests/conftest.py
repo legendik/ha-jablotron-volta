@@ -67,9 +67,6 @@ def _make_coordinator_data() -> dict:
         "boiler_heating_power": 100.0,
         "boiler_analog_value": 0.0,
         "boiler_pwm_value": 0,
-        # DHW status
-        "dhw_state_heat": True,
-        "dhw_temperature_current": 48.5,
         # CH1 status
         "ch1_state_heat": False,
         "ch1_temperature_current": 21.5,
@@ -95,14 +92,6 @@ def _make_coordinator_data() -> dict:
         "boiler_water_setpoint": 60.0,
         "boiler_water_temp_max": 80.0,
         "boiler_water_temp_min": 30.0,
-        # DHW settings
-        "dhw_mode": 1,
-        "dhw_temperature_desired": 50.0,
-        "dhw_temperature_min": 35.0,
-        "dhw_temperature_max": 65.0,
-        "dhw_temperature_manual": 50.0,
-        "dhw_hysteresis": 2.0,
-        "dhw_regulation_strategy": 0,
         # CH1 settings
         "ch1_mode": 2,
         "ch1_temperature_desired": 22.0,

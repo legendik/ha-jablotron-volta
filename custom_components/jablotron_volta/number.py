@@ -42,7 +42,6 @@ from .const import (
     REG_CH2_THRESHOLD_SETPOINT,
     REG_CH2_UI_SENSOR_CORR_HUMI_79,
     REG_CH2_UI_SENSOR_CORR_TEMP_78,
-    REG_DHW_TEMPER_HYSTERESIS,
     REG_ELE_CORR_TEMP_OUTSIDE,
     REG_ELE_TEMPER_WATER_MAX,
     REG_ELE_TEMPER_WATER_MIN,
@@ -156,19 +155,6 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_ELE_TEMPER_WATER_MIN,
         value_fn=lambda data: data.get("boiler_water_temp_min"),
-        scale_fn=unscale_temperature,
-    ),
-    # DHW Settings
-    JablotronVoltaNumberEntityDescription(
-        key="dhw_hysteresis",
-        translation_key="dhw_hysteresis",
-        native_min_value=0.5,
-        native_max_value=10,
-        native_step=0.5,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        mode=NumberMode.BOX,
-        register=REG_DHW_TEMPER_HYSTERESIS,
-        value_fn=lambda data: data.get("dhw_hysteresis"),
         scale_fn=unscale_temperature,
     ),
     # CH1 Settings

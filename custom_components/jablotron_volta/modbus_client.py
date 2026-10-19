@@ -293,11 +293,6 @@ class JablotronModbusClient:
             data["regulation"] = batch1[29:32]
             data["boiler_status"] = batch1[39:49]
 
-        # Batch 2: DHW status (input registers 101-102)
-        batch2 = self.read_input_registers(101, 2)
-        if batch2:
-            data["dhw_status"] = batch2
-
         # Batch 3: CH1 status (input registers 200-206)
         batch3 = self.read_input_registers(200, 7)
         if batch3:
@@ -343,20 +338,6 @@ class JablotronModbusClient:
         batch7 = self.read_holding_registers(1050, 13)
         if batch7:
             data["boiler_settings"] = batch7
-
-        # Batch 8a: DHW settings (holding registers 1100-1104)
-        batch8a = self.read_holding_registers(1100, 5)
-        if batch8a:
-            data["dhw_settings"] = batch8a
-
-        # Batch 8b: DHW settings (holding registers 1106-1107)
-        batch8b = self.read_holding_registers(1106, 2)
-        if batch8b:
-            if "dhw_settings" in data:
-                data["dhw_settings"].append(0)  # Fill gap at 1105
-                data["dhw_settings"].extend(batch8b)  # Add 1106-1107
-            else:
-                data["dhw_settings"] = [0, 0, 0, 0, 0, 0] + batch8b
 
         # Batch 9: CH1 settings (holding registers 1200-1219)
         batch9 = self.read_holding_registers(1200, 20)

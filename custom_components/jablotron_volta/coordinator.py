@@ -118,16 +118,6 @@ def parse_boiler_status(registers: list[int]) -> dict[str, Any]:
     }
 
 
-def parse_dhw_status(registers: list[int]) -> dict[str, Any]:
-    """Parse DHW status registers (2 registers)."""
-    if len(registers) < 2:
-        return {}
-    return {
-        "dhw_state_heat": bool(registers[0]),
-        "dhw_temperature_current": scale_temperature(registers[1]),
-    }
-
-
 def parse_ch_status(registers: list[int], prefix: str) -> dict[str, Any]:
     """Parse heating circuit status registers (7 registers).
 
@@ -183,25 +173,6 @@ def parse_boiler_settings(registers: list[int]) -> dict[str, Any]:
         "boiler_water_setpoint": scale_temperature(registers[4]),
         "boiler_water_temp_max": scale_temperature(registers[5]),
         "boiler_water_temp_min": scale_temperature(registers[6]),
-    }
-
-
-def parse_dhw_settings(registers: list[int]) -> dict[str, Any]:
-    """Parse DHW settings registers (8 registers).
-
-    Note: index 5 (register 1105) is a gap, index 6 = hysteresis (1106),
-    index 7 = regulation strategy (1107).
-    """
-    if len(registers) < 8:
-        return {}
-    return {
-        "dhw_mode": registers[0],
-        "dhw_temperature_desired": scale_temperature(registers[1]),
-        "dhw_temperature_min": scale_temperature(registers[2]),
-        "dhw_temperature_max": scale_temperature(registers[3]),
-        "dhw_temperature_manual": scale_temperature(registers[4]),
-        "dhw_hysteresis": scale_temperature(registers[6]),
-        "dhw_regulation_strategy": registers[7],
     }
 
 
@@ -276,9 +247,6 @@ def process_raw_data(raw_data: dict[str, Any]) -> dict[str, Any]:
     if "boiler_status" in raw_data:
         data.update(parse_boiler_status(raw_data["boiler_status"]))
 
-    if "dhw_status" in raw_data:
-        data.update(parse_dhw_status(raw_data["dhw_status"]))
-
     if "ch1_status" in raw_data:
         data.update(parse_ch_status(raw_data["ch1_status"], "ch1"))
 
@@ -293,9 +261,6 @@ def process_raw_data(raw_data: dict[str, Any]) -> dict[str, Any]:
 
     if "boiler_settings" in raw_data:
         data.update(parse_boiler_settings(raw_data["boiler_settings"]))
-
-    if "dhw_settings" in raw_data:
-        data.update(parse_dhw_settings(raw_data["dhw_settings"]))
 
     if "ch1_settings" in raw_data:
         data.update(parse_ch_settings(raw_data["ch1_settings"], "ch1"))

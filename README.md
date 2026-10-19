@@ -19,7 +19,7 @@ Control your Jablotron Volta electric boiler from Home Assistant via Modbus TCP.
 ## Features
 
 ### Climate Control
-- 3 thermostats: Hot water, Heating Circuit 1 & 2
+- 2 thermostats: Heating Circuit 1 & 2
 - Auto-detects CH2 availability
 
 ### Sensors (30+)

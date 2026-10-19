@@ -22,7 +22,6 @@ from .const import (
     REGU_MODE_MAP,
     REG_CH1_REGULATION_STRAT,
     REG_CH2_REGULATION_STRAT,
-    REG_DHW_REGULATION_STRAT,
     REG_REGU_MODE_USER,
     REG_REGU_SOURCE_OUT_TEMPER,
     REG_SYS_CONTROL,
@@ -57,13 +56,6 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
         options_map=OUT_TEMP_SOURCE_MAP,
         register=REG_REGU_SOURCE_OUT_TEMPER,
         value_fn=lambda data: data.get("outdoor_temp_source"),
-    ),
-    JablotronVoltaSelectEntityDescription(
-        key="dhw_regulation_strategy",
-        translation_key="dhw_regulation_strategy",
-        options_map={0: "strategy_0", 1: "strategy_1", 2: "strategy_2"},
-        register=REG_DHW_REGULATION_STRAT,
-        value_fn=lambda data: data.get("dhw_regulation_strategy"),
     ),
     JablotronVoltaSelectEntityDescription(
         key="ch1_regulation_strategy",

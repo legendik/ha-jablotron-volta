@@ -32,12 +32,6 @@ class JablotronVoltaBinarySensorEntityDescription(BinarySensorEntityDescription)
 
 BINARY_SENSOR_TYPES: tuple[JablotronVoltaBinarySensorEntityDescription, ...] = (
     JablotronVoltaBinarySensorEntityDescription(
-        key="dhw_heating",
-        translation_key="dhw_heating",
-        device_class=BinarySensorDeviceClass.HEAT,
-        value_fn=lambda data: data.get("dhw_state_heat", False),
-    ),
-    JablotronVoltaBinarySensorEntityDescription(
         key="ch1_heating",
         translation_key="ch1_heating",
         device_class=BinarySensorDeviceClass.HEAT,

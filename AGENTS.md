@@ -113,10 +113,10 @@ custom_components/jablotron_volta/
 ├── scaling.py         # Pure scaling/conversion functions (no I/O)
 ├── config_flow.py     # UI configuration flow
 ├── sensor.py          # ~30 sensors (temps, energy, pressure, voltages)
-├── binary_sensor.py   # 4 binary sensors (heating states, alerts)
-├── climate.py         # 3 climate entities (DHW, CH1, CH2)
+├── binary_sensor.py   # 3 binary sensors (heating states, alerts)
+├── climate.py         # 2 climate entities (CH1, CH2)
 ├── number.py          # ~30 number entities (setpoints, corrections)
-├── select.py          # 7 select entities (modes, strategies)
+├── select.py          # 6 select entities (modes, strategies)
 ├── switch.py          # 4 switches (optimal start, fast cooldown)
 ├── button.py          # 2 buttons (reset error, restart)
 └── translations/      # en.json, cs.json

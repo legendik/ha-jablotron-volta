@@ -95,14 +95,6 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         value_fn=lambda data: data.get("ch2_temperature_current"),
         available_fn=lambda coord: coord.ch2_available,
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="dhw_temperature_current",
-        translation_key="dhw_temperature_current",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("dhw_temperature_current"),
-    ),
     # Boiler Water Temperatures
     JablotronVoltaSensorEntityDescription(
         key="boiler_water_input_temp",
