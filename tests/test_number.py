@@ -17,7 +17,6 @@ from custom_components.jablotron_volta.scaling import (
 
 from .conftest import _make_coordinator_data
 
-
 # ---------------------------------------------------------------------------
 # Descriptor-level validation (no fixtures needed)
 # ---------------------------------------------------------------------------

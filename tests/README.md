@@ -96,7 +96,7 @@ This integration uses Home Assistant's translation-based entity naming system:
 
 ```python
 # In entity descriptions:
-translation_key="outdoor_temperature_damped"  # Full word!
+translation_key = "outdoor_temperature_damped"  # Full word!
 
 # In coordinator data:
 data["outdoor_temp_damped"] = 10.5  # Short form OK here
@@ -152,11 +152,14 @@ def test_my_entity_has_translation():
 ```python
 def test_entity_init(mock_coordinator, mock_config_entry):
     """Test entity initialization."""
-    from custom_components.jablotron_volta.sensor import JablotronVoltaSensor, SENSOR_TYPES
-    
+    from custom_components.jablotron_volta.sensor import (
+        JablotronVoltaSensor,
+        SENSOR_TYPES,
+    )
+
     desc = SENSOR_TYPES[0]
     sensor = JablotronVoltaSensor(mock_coordinator, mock_config_entry, desc)
-    
+
     assert sensor.coordinator == mock_coordinator
 ```
 

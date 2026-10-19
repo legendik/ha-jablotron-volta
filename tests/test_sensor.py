@@ -13,7 +13,6 @@ from custom_components.jablotron_volta.sensor import (
 
 from .conftest import _make_coordinator_data
 
-
 # ---------------------------------------------------------------------------
 # Descriptor-level validation (no fixtures needed)
 # ---------------------------------------------------------------------------

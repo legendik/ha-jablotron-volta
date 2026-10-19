@@ -17,10 +17,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfPressure,
     UnitOfTemperature,
-    UnitOfElectricPotential,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
