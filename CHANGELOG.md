@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.0.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.2...jablotron-volta-v2.0.0) (2026-10-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove DHW (hot water) entities and register support ([#15](https://github.com/legendik/ha-jablotron-volta/issues/15))
+
+### refactor
+
+* remove DHW (hot water) entities and register support ([#15](https://github.com/legendik/ha-jablotron-volta/issues/15)) ([0a6b7ec](https://github.com/legendik/ha-jablotron-volta/commit/0a6b7ecccf5ceab501fb6ed4d98eb2fb3a9423c3))
+
+
+### Bug Fixes
+
+* use Python 3.13 in CI to match homeassistant&gt;=2025.9.0 requirement ([fee5530](https://github.com/legendik/ha-jablotron-volta/commit/fee553008f49f4489144bb62f9859e0ed55fe260))
+
+
+### Documentation
+
+* add agents.md file ([4f1963d](https://github.com/legendik/ha-jablotron-volta/commit/4f1963d5497e77eea3149b853395b27e4857ea21))
+* add dashboard ([0a454fb](https://github.com/legendik/ha-jablotron-volta/commit/0a454fb5a5a189aa1701813923d116572751040c))
+* improve agents instructions ([24eaad4](https://github.com/legendik/ha-jablotron-volta/commit/24eaad4f8ef15da47370d523e5eb15cdb2510456))
+* shorter README ([b841ff2](https://github.com/legendik/ha-jablotron-volta/commit/b841ff2cbafde04392954347983b4e54d7d1ff68))
+* update README ([376cd97](https://github.com/legendik/ha-jablotron-volta/commit/376cd97f226bd44d62e60eb9bdd00aab97dc77d9))
+
+
+### Miscellaneous
+
+* add license ([1c16b19](https://github.com/legendik/ha-jablotron-volta/commit/1c16b19440fc82a15f702e18ced829e17f17a7ab))
+* drop dashboards for now ([b68f1b3](https://github.com/legendik/ha-jablotron-volta/commit/b68f1b30a4d9895471a9c7f7b9bd76b8f97c297d))
+* **hacs:** apply Home Assistant best practices audit ([#17](https://github.com/legendik/ha-jablotron-volta/issues/17)) ([bb8ce9e](https://github.com/legendik/ha-jablotron-volta/commit/bb8ce9e679dc9f8649a3213263bcbbe49ce1d47a))
+
 ## [1.3.2](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.1...jablotron-volta-v1.3.2) (2026-02-17)
 
 
