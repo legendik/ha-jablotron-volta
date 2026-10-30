@@ -12,14 +12,16 @@ from homeassistant.components.number import (
     NumberEntityDescription,
     NumberMode,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature, UnitOfTime
+from homeassistant.const import (
+    PERCENTAGE,
+    EntityCategory,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import (
-    DOMAIN,
     REG_CH1_EQUITHERM_OFFSET,
     REG_CH1_EQUITHERM_ROOM_EFFECT,
     REG_CH1_EQUITHERM_SLOPE,
@@ -50,7 +52,8 @@ from .const import (
     REG_REGU_TEMPER_CHANGEOVER,
     REG_REGU_TEMPER_OUTSIDE,
 )
-from .coordinator import JablotronVoltaCoordinator
+from .coordinator import JablotronVoltaConfigEntry, JablotronVoltaCoordinator
+from .entity import JablotronVoltaEntity
 from .scaling import (
     unscale_ratio,
     unscale_signed_percentage,
@@ -61,14 +64,17 @@ from .scaling import (
 _LOGGER = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
+PARALLEL_UPDATES = 0
+
+
+@dataclass(frozen=True, kw_only=True)
 class JablotronVoltaNumberEntityDescription(NumberEntityDescription):
     """Describes Jablotron Volta number entity."""
 
-    value_fn: Callable[[dict[str, Any]], float | None] | None = None
-    register: int | None = None
-    scale_fn: Callable[[float], int] | None = None
-    available_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
+    value_fn: Callable[[dict[str, Any]], float | None]
+    register: int
+    scale_fn: Callable[[float], int]
+    exists_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
 
 
 NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
@@ -83,7 +89,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         mode=NumberMode.BOX,
         register=REG_REGU_BUILDING_MOMENTUM,
         value_fn=lambda data: data.get("building_momentum"),
-        scale_fn=lambda x: int(x),
+        scale_fn=int,
     ),
     JablotronVoltaNumberEntityDescription(
         key="composite_filter_ratio",
@@ -235,11 +241,11 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         native_min_value=0,
         native_max_value=100,
         native_step=5,
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.SLIDER,
         register=REG_CH1_EQUITHERM_ROOM_EFFECT,
         value_fn=lambda data: data.get("ch1_equitherm_room_effect"),
-        scale_fn=lambda x: int(x),
+        scale_fn=int,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch1_threshold_setpoint",
@@ -283,7 +289,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         native_min_value=-20,
         native_max_value=20,
         native_step=1,
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.BOX,
         register=REG_CH1_UI_SENSOR_CORR_HUMI_79,
         value_fn=lambda data: data.get("ch1_humidity_correction"),
@@ -301,7 +307,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_TEMPER_ANTIFROST,
         value_fn=lambda data: data.get("ch2_temperature_antifrost"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_hysteresis",
@@ -314,7 +320,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_TEMPER_HYSTERESIS,
         value_fn=lambda data: data.get("ch2_hysteresis"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_min",
@@ -327,7 +333,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_TEMPER_WATER_MIN,
         value_fn=lambda data: data.get("ch2_water_temp_min"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_water_temp_max",
@@ -340,7 +346,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_TEMPER_WATER_MAX,
         value_fn=lambda data: data.get("ch2_water_temp_max"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_slope",
@@ -352,7 +358,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_EQUITHERM_SLOPE,
         value_fn=lambda data: data.get("ch2_equitherm_slope"),
         scale_fn=unscale_ratio,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_offset",
@@ -365,7 +371,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_EQUITHERM_OFFSET,
         value_fn=lambda data: data.get("ch2_equitherm_offset"),
         scale_fn=unscale_signed_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_equitherm_room_effect",
@@ -373,12 +379,12 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         native_min_value=0,
         native_max_value=100,
         native_step=5,
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.SLIDER,
         register=REG_CH2_EQUITHERM_ROOM_EFFECT,
         value_fn=lambda data: data.get("ch2_equitherm_room_effect"),
-        scale_fn=lambda x: int(x),
-        available_fn=lambda coord: coord.ch2_available,
+        scale_fn=int,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_threshold_setpoint",
@@ -391,7 +397,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_THRESHOLD_SETPOINT,
         value_fn=lambda data: data.get("ch2_threshold_setpoint"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_limit_heat_temp",
@@ -404,7 +410,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_LIMIT_HEAT_TEMPER,
         value_fn=lambda data: data.get("ch2_limit_heat_temp"),
         scale_fn=unscale_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_temp_correction",
@@ -417,7 +423,7 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         register=REG_CH2_UI_SENSOR_CORR_TEMP_78,
         value_fn=lambda data: data.get("ch2_temp_correction"),
         scale_fn=unscale_signed_temperature,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaNumberEntityDescription(
         key="ch2_humidity_correction",
@@ -425,74 +431,53 @@ NUMBER_TYPES: tuple[JablotronVoltaNumberEntityDescription, ...] = (
         native_min_value=-20,
         native_max_value=20,
         native_step=1,
-        native_unit_of_measurement="%",
+        native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.BOX,
         register=REG_CH2_UI_SENSOR_CORR_HUMI_79,
         value_fn=lambda data: data.get("ch2_humidity_correction"),
         scale_fn=unscale_signed_percentage,
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
 )
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: JablotronVoltaConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up Jablotron Volta number entities."""
-    coordinator: JablotronVoltaCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities: list[NumberEntity] = []
-
-    for description in NUMBER_TYPES:
-        if description.available_fn and not description.available_fn(coordinator):
-            continue
-
-        entities.append(JablotronVoltaNumber(coordinator, entry, description))
-
-    async_add_entities(entities)
+    coordinator = entry.runtime_data
+    async_add_entities(
+        JablotronVoltaNumber(coordinator, description)
+        for description in NUMBER_TYPES
+        if description.exists_fn is None or description.exists_fn(coordinator)
+    )
 
 
-class JablotronVoltaNumber(CoordinatorEntity, NumberEntity):
+class JablotronVoltaNumber(JablotronVoltaEntity, NumberEntity):
     """Representation of a Jablotron Volta number entity."""
 
     entity_description: JablotronVoltaNumberEntityDescription
-    _attr_has_entity_name = True
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(
         self,
         coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
         description: JablotronVoltaNumberEntityDescription,
     ) -> None:
         """Initialize the number entity."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, description.key)
         self.entity_description = description
-        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_device_info = coordinator.device_info
 
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-        if self.entity_description.value_fn:
-            return self.entity_description.value_fn(self.coordinator.data)
-        return None
+        return self.entity_description.value_fn(self.coordinator.data)
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the setting."""
-        if not self.entity_description.register or not self.entity_description.scale_fn:
-            return
-
-        scaled_value = self.entity_description.scale_fn(value)
-
-        success = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
+        await self._async_write_register(
             self.entity_description.register,
-            scaled_value,
+            self.entity_description.scale_fn(value),
         )
-
-        if success:
-            await self.coordinator.async_request_refresh()
-        else:
-            _LOGGER.error("Failed to set %s to %s", self.entity_description.key, value)

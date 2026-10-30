@@ -1,0 +1,96 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: The integration registers no custom actions.
+  appropriate-polling: done
+  brands:
+    status: todo
+    comment: No icon in home-assistant/brands yet.
+  common-modules: done
+  config-flow: done
+  config-flow-test-coverage: done
+  dependency-transparency: done
+  docs-actions:
+    status: exempt
+    comment: The integration registers no custom actions.
+  docs-conditions:
+    status: exempt
+    comment: The integration provides no conditions.
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  docs-triggers:
+    status: exempt
+    comment: The integration provides no triggers.
+  entity-event-setup:
+    status: exempt
+    comment: Entities only consume coordinator updates.
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup: done
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters:
+    status: exempt
+    comment: No options flow.
+  docs-installation-parameters: done
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable: done
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: The device has no user credentials; the system password is fixed.
+  test-coverage: done
+
+  # Gold
+  devices: done
+  diagnostics: done
+  discovery:
+    status: todo
+    comment: Not evaluated whether the boiler can be found via DHCP (MAC prefix).
+  discovery-update-info:
+    status: todo
+    comment: Depends on discovery.
+  docs-data-update: done
+  docs-examples:
+    status: todo
+    comment: Only a dashboard example; no automation examples.
+  docs-known-limitations: done
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases:
+    status: todo
+  dynamic-devices:
+    status: exempt
+    comment: One config entry represents exactly one boiler.
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations: done
+  icon-translations:
+    status: todo
+    comment: No icons.json yet.
+  reconfiguration-flow: done
+  repair-issues:
+    status: exempt
+    comment: No user-fixable issues are raised.
+  stale-devices:
+    status: exempt
+    comment: One config entry represents exactly one boiler.
+
+  # Platinum
+  async-dependency: done
+  inject-websession:
+    status: exempt
+    comment: Modbus TCP, no HTTP session.
+  strict-typing:
+    status: todo

@@ -8,16 +8,37 @@
           "host": "IP adresa",
           "port": "Port",
           "device_id": "ID zařízení (Modbus Slave ID)"
+        },
+        "data_description": {
+          "host": "Název hostitele nebo IP adresa kotle Volta.",
+          "port": "Modbus TCP port kotle (výchozí 502).",
+          "device_id": "Modbus ID jednotky nastavené v kotli (výchozí 1)."
+        }
+      },
+      "reconfigure": {
+        "title": "Změna nastavení Jablotron Volta",
+        "description": "Upravte připojovací údaje k vašemu zařízení Jablotron Volta",
+        "data": {
+          "host": "IP adresa",
+          "port": "Port",
+          "device_id": "ID zařízení (Modbus Slave ID)"
+        },
+        "data_description": {
+          "host": "Název hostitele nebo IP adresa kotle Volta.",
+          "port": "Modbus TCP port kotle (výchozí 502).",
+          "device_id": "Modbus ID jednotky nastavené v kotli (výchozí 1)."
         }
       }
     },
     "error": {
-      "cannot_connect": "Nepodařilo se připojit k zařízení",
-      "cannot_read": "Připojeno, ale nelze načíst data ze zařízení",
-      "unknown": "Nastala neočekávaná chyba"
+      "cannot_connect": "Nepodařilo se připojit k zařízení. Zkontrolujte IP adresu a port.",
+      "cannot_read": "Připojeno, ale nelze načíst data ze zařízení. Zkontrolujte ID zařízení (slave ID) a zda je v zařízení povolen Modbus TCP.",
+      "unknown": "Nastala neočekávaná chyba. Podrobnosti najdete v logu."
     },
     "abort": {
-      "already_configured": "Zařízení je již nakonfigurováno"
+      "already_configured": "Zařízení je již nakonfigurováno",
+      "reconfigure_successful": "Změna nastavení proběhla úspěšně",
+      "wrong_device": "Na této adrese je jiná jednotka Volta (sériové číslo nesouhlasí)."
     }
   },
   "entity": {
@@ -118,22 +139,63 @@
     },
     "select": {
       "ch1_regulation_strategy": {
-        "name": "CH1 Regulation Strategy"
+        "name": "CH1 Regulation Strategy",
+        "state": {
+          "direct_setpoint": "Přímá žádaná hodnota",
+          "constant_water_temp": "Konstantní teplota vody",
+          "equitherm_with_room": "Ekviterm s vlivem místnosti",
+          "room_pid": "PID podle místnosti",
+          "floor_drying_1": "Vysoušení podlahy 1",
+          "floor_drying_2": "Vysoušení podlahy 2",
+          "floor_drying_3": "Vysoušení podlahy 3",
+          "analog_0_10v": "Analogový vstup 0-10 V"
+        }
       },
       "ch2_regulation_strategy": {
-        "name": "CH2 Regulation Strategy"
+        "name": "CH2 Regulation Strategy",
+        "state": {
+          "direct_setpoint": "Přímá žádaná hodnota",
+          "constant_water_temp": "Konstantní teplota vody",
+          "equitherm_with_room": "Ekviterm s vlivem místnosti",
+          "room_pid": "PID podle místnosti",
+          "floor_drying_1": "Vysoušení podlahy 1",
+          "floor_drying_2": "Vysoušení podlahy 2",
+          "floor_drying_3": "Vysoušení podlahy 3",
+          "analog_0_10v": "Analogový vstup 0-10 V"
+        }
       },
       "control_mode": {
-        "name": "Control Mode"
+        "name": "Control Mode",
+        "state": {
+          "monitoring": "Pouze monitorování",
+          "full_control": "Plné řízení",
+          "power_control": "Řízení výkonu"
+        }
       },
       "master_fail_mode": {
-        "name": "Master Fail Mode"
+        "name": "Master Fail Mode",
+        "state": {
+          "standby": "Pohotovostní režim",
+          "no_action": "Žádná akce"
+        }
       },
       "outdoor_temperature_source": {
-        "name": "Outdoor Temp Source"
+        "name": "Outdoor Temp Source",
+        "state": {
+          "none": "Žádný",
+          "boiler": "Čidlo kotle",
+          "cloud": "Cloud",
+          "iomodule": "I/O modul"
+        }
       },
       "regulation_mode": {
-        "name": "Regulation Mode"
+        "name": "Regulation Mode",
+        "state": {
+          "standby": "Pohotovostní režim",
+          "auto": "Automaticky",
+          "summer": "Léto",
+          "winter": "Zima"
+        }
       }
     },
     "number": {
@@ -265,6 +327,17 @@
       "ch2": {
         "name": "Heating Circuit 2"
       }
+    }
+  },
+  "exceptions": {
+    "update_failed": {
+      "message": "Chyba komunikace se zařízením: {error}"
+    },
+    "no_data": {
+      "message": "Zařízení nevrátilo žádná data"
+    },
+    "write_failed": {
+      "message": "Nepodařilo se změnit {entity_id}: {error}"
     }
   }
 }

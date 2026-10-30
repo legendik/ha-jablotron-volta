@@ -1,17 +1,16 @@
 """Constants for Jablotron Volta integration."""
 
+from __future__ import annotations
+
 from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "jablotron_volta"
-DEFAULT_NAME: Final = "Jablotron Volta"
 DEFAULT_PORT: Final = 502
 DEFAULT_DEVICE_ID: Final = 1
 DEFAULT_SCAN_INTERVAL: Final = 30
 
 # Config flow
-CONF_HOST: Final = "host"
-CONF_PORT: Final = "port"
 CONF_DEVICE_ID: Final = "device_id"
 
 # Data update
@@ -29,7 +28,7 @@ MODEL: Final = "Volta"
 # ============================================================================
 
 # Device Information (1-11)
-REG_SERIAL_NUMBER_0: Final = 0
+REG_SERIAL_NUMBER_0: Final = 1
 REG_SERIAL_NUMBER_1: Final = 2
 REG_DEVICE_ID_0: Final = 3
 REG_DEVICE_ID_1: Final = 4
@@ -225,12 +224,6 @@ OUT_TEMP_SOURCE_MAP: Final = {
 CH_MODE_STANDBY: Final = 0
 CH_MODE_MANUAL: Final = 1
 CH_MODE_SCHEDULE: Final = 2
-
-CH_MODE_MAP: Final = {
-    CH_MODE_STANDBY: "off",
-    CH_MODE_MANUAL: "heat",
-    CH_MODE_SCHEDULE: "auto",
-}
 
 # Regulation Strategy (REG_CH1_REGULATION_STRAT / REG_CH2_REGULATION_STRAT)
 STRAT_DIRECT_SETPOINT: Final = 0

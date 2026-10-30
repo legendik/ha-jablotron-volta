@@ -1,316 +1,167 @@
-"""Modbus TCP client for Jablotron Volta."""
+"""Async Modbus TCP client for Jablotron Volta."""
 
 from __future__ import annotations
 
+import asyncio
 import logging
+from collections.abc import Awaitable, Callable
 from typing import Any
 
-from pymodbus.client import ModbusTcpClient
+from pymodbus.client import AsyncModbusTcpClient
 from pymodbus.exceptions import ModbusException
+from pymodbus.pdu import ModbusPDU
 
-from .const import SYSTEM_PASSWORD
-from .scaling import (
-    ip_to_registers as _ip_to_registers,
-)
-from .scaling import (
-    registers_to_ip as _registers_to_ip,
-)
-from .scaling import (
-    registers_to_mac as _registers_to_mac,
-)
-from .scaling import (
-    registers_to_uint32 as _registers_to_uint32,
-)
-from .scaling import (
-    scale_percentage as _scale_percentage,
-)
-from .scaling import (
-    scale_pressure as _scale_pressure,
-)
-from .scaling import (
-    scale_ratio as _scale_ratio,
-)
-from .scaling import (
-    scale_signed_percentage as _scale_signed_percentage,
-)
-from .scaling import (
-    scale_signed_temperature as _scale_signed_temperature,
-)
-from .scaling import (
-    scale_temperature as _scale_temperature,
-)
-from .scaling import (
-    scale_voltage as _scale_voltage,
-)
-from .scaling import (
-    unscale_percentage as _unscale_percentage,
-)
-from .scaling import (
-    unscale_pressure as _unscale_pressure,
-)
-from .scaling import (
-    unscale_ratio as _unscale_ratio,
-)
-from .scaling import (
-    unscale_signed_temperature as _unscale_signed_temperature,
-)
-from .scaling import (
-    unscale_temperature as _unscale_temperature,
-)
-from .scaling import (
-    unscale_voltage as _unscale_voltage,
-)
+from .const import REG_SERIAL_NUMBER_0, REG_SYS_PASSWORD, SYSTEM_PASSWORD
+from .scaling import registers_to_uint32
 
 _LOGGER = logging.getLogger(__name__)
 
+# Holding registers in this range are only accessible after writing the
+# system password to REG_SYS_PASSWORD.
+PROTECTED_REGISTERS = range(1000, 4000)
+
+type _ReadMethod = Callable[..., Awaitable[ModbusPDU]]
+
+
+class JablotronVoltaError(Exception):
+    """Base error for Jablotron Volta communication."""
+
+
+class JablotronVoltaConnectionError(JablotronVoltaError):
+    """The device is unreachable or the connection dropped mid-request."""
+
+
+class JablotronVoltaResponseError(JablotronVoltaError):
+    """The device answered with a Modbus error response."""
+
 
 class JablotronModbusClient:
-    """Wrapper for Modbus TCP client with batched reading support."""
+    """Modbus TCP client keeping one connection open between requests.
+
+    All device access is serialized through a single lock so the coordinator
+    poll and entity writes never interleave on the same connection.
+    """
 
     def __init__(self, host: str, port: int, device_id: int) -> None:
-        """Initialize the Modbus client."""
+        """Initialize the client."""
         self.host = host
         self.port = port
         self.device_id = device_id
-        # Initialize client with slave/unit ID - PyModbus 3.11.2
-        self._client = ModbusTcpClient(
-            host=host,
-            port=port,
-            timeout=5,
-            # Slave ID is now set globally on the client
-            # In 3.11.2 it's called 'slave' in constructor
+        # Reconnects are handled explicitly in _connect(); pymodbus' background
+        # auto-reconnect is disabled so connection state stays predictable.
+        self._client = AsyncModbusTcpClient(
+            host, port=port, timeout=5, reconnect_delay=0
         )
-        self._authenticated = False
+        self._lock = asyncio.Lock()
 
-    def connect(self) -> bool:
-        """Connect to the Modbus device."""
-        try:
-            _LOGGER.info("Connecting to Modbus device at %s:%s", self.host, self.port)
-            result = self._client.connect()
-            if result:
-                _LOGGER.info("Successfully connected to %s:%s", self.host, self.port)
-                # Authenticate immediately after connection
-                # This is required for reading/writing holding registers
-                if not self.authenticate_system_access():
-                    _LOGGER.error("Failed to authenticate after connection")
-                    return False
-                _LOGGER.info("Connection and authentication complete")
-            else:
-                _LOGGER.error("Connection failed (result was False)")
-            return result
-        except Exception:
-            _LOGGER.exception("Connection failed to %s:%s", self.host, self.port)
-            return False
+    async def async_read_serial_number(self) -> str:
+        """Connect, authenticate and read the device serial number.
 
-    def close(self) -> None:
-        """Close the connection."""
-        try:
-            self._client.close()
-            self._authenticated = False
-            _LOGGER.debug("Connection closed to %s:%s", self.host, self.port)
-        except Exception:
-            _LOGGER.exception("Error closing connection")
-
-    def authenticate_system_access(self) -> bool:
-        """Authenticate for system register access (password 5586)."""
-        if self._authenticated:
-            _LOGGER.debug("Already authenticated, skipping")
-            return True
-
-        try:
-            # Write password directly without calling write_register to avoid recursion
-            _LOGGER.info(
-                "Authenticating with password %s to register 3001", SYSTEM_PASSWORD
-            )
-            result = self._client.write_register(
-                3001, SYSTEM_PASSWORD, device_id=self.device_id
-            )
-
-            _LOGGER.info("Authentication result: %s (type: %s)", result, type(result))
-
-            # Check for errors
-            if hasattr(result, "isError") and result.isError():
-                _LOGGER.error("System authentication failed with error: %s", result)
-                return False
-
-            # Check if result indicates success
-            if not hasattr(result, "function_code"):
-                _LOGGER.error("Unexpected authentication response format: %s", result)
-                return False
-
-            self._authenticated = True
-            _LOGGER.info("System authentication successful!")
-            return True
-        except Exception:
-            _LOGGER.exception("Authentication exception")
-            return False
-
-    def read_input_registers(self, address: int, count: int = 1) -> list[int] | None:
-        """Read input registers (read-only monitoring data)."""
-        try:
-            _LOGGER.debug(
-                "Reading input registers: address=%s, count=%s, device_id=%s",
-                address,
-                count,
-                self.device_id,
-            )
-            # PyModbus 3.11.2: count and device_id are keyword-only arguments
-            result = self._client.read_input_registers(
-                address, count=count, device_id=self.device_id
-            )
-            _LOGGER.debug("Read result: %s", result)
-
-            # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, "isError") and result.isError():
-                _LOGGER.error(
-                    "Modbus error reading input registers at %s (count %s): %s",
-                    address,
-                    count,
-                    result,
-                )
-                return None
-
-            # Alternative error check for newer pymodbus versions
-            if not hasattr(result, "registers"):
-                _LOGGER.error(
-                    "Invalid response reading input registers at %s (count %s): %s",
-                    address,
-                    count,
-                    result,
-                )
-                return None
-
-            _LOGGER.debug(
-                "Successfully read %s registers from address %s: %s",
-                len(result.registers),
-                address,
-                result.registers,
-            )
-            return result.registers
-        except ModbusException as err:
-            _LOGGER.error("Modbus exception reading input registers: %s", err)
-            return None
-        except Exception:
-            _LOGGER.exception("Unexpected error reading input registers")
-            return None
-
-    def read_holding_registers(self, address: int, count: int = 1) -> list[int] | None:
-        """Read holding registers (configuration data).
-
-        Note: Authentication must be performed before calling this method.
-        Use authenticate_system_access() before reading holding registers.
+        Used to validate connection settings; closes the connection afterwards.
         """
+        async with self._lock:
+            try:
+                await self._connect()
+                await self._authenticate()
+                registers = await self._read(
+                    self._client.read_input_registers, REG_SERIAL_NUMBER_0, 2
+                )
+            finally:
+                self._client.close()
+        if registers is None:
+            raise JablotronVoltaResponseError("Device did not return its serial number")
+        return str(registers_to_uint32(registers[0], registers[1]))
+
+    async def async_read_all_data(self) -> dict[str, Any]:
+        """Read all relevant registers in batches."""
+        async with self._lock:
+            await self._connect()
+            # Authenticate on every poll: the device session state is not
+            # documented, so never rely on an earlier login.
+            await self._authenticate()
+            return await self._read_all()
+
+    async def async_write_register(self, address: int, value: int) -> None:
+        """Write a single holding register."""
+        async with self._lock:
+            await self._connect()
+            if address in PROTECTED_REGISTERS:
+                await self._authenticate()
+            await self._write(address, value)
+
+    async def async_close(self) -> None:
+        """Close the connection."""
+        async with self._lock:
+            self._client.close()
+
+    async def _connect(self) -> None:
+        """Open the connection if it is not open."""
+        if self._client.connected:
+            return
+        _LOGGER.debug("Connecting to %s:%s", self.host, self.port)
+        if not await self._client.connect():
+            raise JablotronVoltaConnectionError(
+                f"Cannot connect to {self.host}:{self.port}"
+            )
+
+    async def _authenticate(self) -> None:
+        """Unlock protected holding registers."""
+        await self._write(REG_SYS_PASSWORD, SYSTEM_PASSWORD)
+
+    async def _read(
+        self, method: _ReadMethod, address: int, count: int
+    ) -> list[int] | None:
+        """Read registers; None when the device rejects the request."""
         try:
-            _LOGGER.debug(
-                "Reading holding registers: address=%s, count=%s, device_id=%s",
-                address,
-                count,
-                self.device_id,
-            )
-            # PyModbus 3.11.2: count and device_id are keyword-only arguments
-            result = self._client.read_holding_registers(
-                address, count=count, device_id=self.device_id
-            )
-            _LOGGER.debug("Read result: %s", result)
-
-            # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, "isError") and result.isError():
-                _LOGGER.error(
-                    "Modbus error reading holding registers at %s (count %s): %s",
-                    address,
-                    count,
-                    result,
-                )
-                return None
-
-            # Alternative error check for newer pymodbus versions
-            if not hasattr(result, "registers"):
-                _LOGGER.error(
-                    "Invalid response reading holding registers at %s (count %s): %s",
-                    address,
-                    count,
-                    result,
-                )
-                return None
-
-            _LOGGER.debug(
-                "Successfully read %s registers from address %s: %s",
-                len(result.registers),
-                address,
-                result.registers,
-            )
-            return result.registers
+            result = await method(address, count=count, device_id=self.device_id)
         except ModbusException as err:
-            _LOGGER.error("Modbus exception reading holding registers: %s", err)
-            return None
-        except Exception:
-            _LOGGER.exception("Unexpected error reading holding registers")
-            return None
-
-    def write_register(self, address: int, value: int) -> bool:
-        """Write a single register."""
-        try:
-            # Holding registers (1000-3999) require authentication
-            # Authenticate before writing to any holding register
-            if 1000 <= address <= 3999 and not self.authenticate_system_access():
-                _LOGGER.error(
-                    "Failed to authenticate before writing to register %s",
-                    address,
-                )
-                return False
-
+            self._client.close()
+            raise JablotronVoltaConnectionError(
+                f"Reading registers {address}-{address + count - 1} failed: {err}"
+            ) from err
+        if result.isError():
             _LOGGER.debug(
-                "Writing register: address=%s, value=%s, device_id=%s",
+                "Device rejected read of registers %s-%s: %s",
                 address,
-                value,
-                self.device_id,
+                address + count - 1,
+                result,
             )
-            # PyModbus 3.11.2: device_id is a keyword-only argument
-            result = self._client.write_register(
+            return None
+        return list(result.registers)
+
+    async def _write(self, address: int, value: int) -> None:
+        """Write a register, raising on any failure."""
+        try:
+            result = await self._client.write_register(
                 address, value, device_id=self.device_id
             )
-            _LOGGER.debug("Write result: %s", result)
-
-            # Check for errors - pymodbus 3.x compatibility
-            if hasattr(result, "isError") and result.isError():
-                _LOGGER.error(
-                    "Modbus error writing register at %s with value %s: %s",
-                    address,
-                    value,
-                    result,
-                )
-                return False
-
-            _LOGGER.debug("Successfully wrote %s to register %s", value, address)
-            return True
         except ModbusException as err:
-            _LOGGER.error("Modbus exception writing register: %s", err)
-            return False
-        except Exception:
-            _LOGGER.exception("Unexpected error writing register")
-            return False
+            self._client.close()
+            raise JablotronVoltaConnectionError(
+                f"Writing register {address} failed: {err}"
+            ) from err
+        if result.isError():
+            raise JablotronVoltaResponseError(
+                f"Device rejected writing {value} to register {address}: {result}"
+            )
 
-    def read_all_data(self) -> dict[str, Any]:
-        """Read all relevant data from the device in batched operations."""
+    async def _read_input(self, address: int, count: int) -> list[int] | None:
+        return await self._read(self._client.read_input_registers, address, count)
+
+    async def _read_holding(self, address: int, count: int) -> list[int] | None:
+        return await self._read(self._client.read_holding_registers, address, count)
+
+    async def _read_all(self) -> dict[str, Any]:
+        """Read every register batch the integration uses."""
         data: dict[str, Any] = {}
 
-        # Authentication is already done in connect() method
-        # No need to authenticate again here
-
-        # Batch 1: Device info and system status (input registers)
-        # Note: Not all registers exist - we read in chunks to avoid gaps
-
-        # 1-17: Serial, device ID, HW/FW versions, MAC, IP
-        batch1a = self.read_input_registers(1, 17)
-        # 20-21: System info
-        batch1b = self.read_input_registers(20, 2)
-        # 30-32: Regulation info
-        batch1c = self.read_input_registers(30, 3)
-        # 40-49: Boiler status
-        batch1d = self.read_input_registers(40, 10)
-
+        # Input registers 1-49 are sparse; read the populated ranges and
+        # re-assemble them with zero-filled gaps.
+        batch1a = await self._read_input(1, 17)  # device + network info
+        batch1b = await self._read_input(20, 2)  # system status
+        batch1c = await self._read_input(30, 3)  # regulation
+        batch1d = await self._read_input(40, 10)  # boiler status
         if batch1a and batch1b and batch1c and batch1d:
-            # Combine with gaps filled as zeros
             batch1 = batch1a + [0, 0] + batch1b + [0] * 8 + batch1c + [0] * 7 + batch1d
             data["device_info"] = batch1[0:11]
             data["network_info"] = batch1[11:17]
@@ -318,158 +169,35 @@ class JablotronModbusClient:
             data["regulation"] = batch1[29:32]
             data["boiler_status"] = batch1[39:49]
 
-        # Batch 3: CH1 status (input registers 200-206)
-        batch3 = self.read_input_registers(200, 7)
-        if batch3:
-            data["ch1_status"] = batch3
+        if ch1_status := await self._read_input(200, 7):
+            data["ch1_status"] = ch1_status
 
-        # Batch 4: CH2 status (input registers 300-306)
-        # Only read if CH2 is available
-        batch4 = self.read_input_registers(300, 7)
-        if batch4:
-            # Check if data is valid (not all zeros or 0xFFFF)
-            if any(val != 0 and val != 0xFFFF for val in batch4):
-                data["ch2_status"] = batch4
+        if ch2_status := await self._read_input(300, 7):
+            # An absent circuit reports all zeros or 0xFFFF
+            if any(val not in (0, 0xFFFF) for val in ch2_status):
+                data["ch2_status"] = ch2_status
                 data["ch2_available"] = True
             else:
                 data["ch2_available"] = False
 
-        # Batch 5a: System alerts (holding registers 1001-1002)
-        batch5a = self.read_holding_registers(1001, 2)
-        if batch5a:
-            data["system_alerts"] = batch5a
+        if system_alerts := await self._read_holding(1001, 2):
+            data["system_alerts"] = system_alerts
 
-        # Batch 5b: Ethernet config (holding registers 1010-1018)
-        batch5b = self.read_holding_registers(1010, 9)
-        if batch5b:
-            data["ethernet_config"] = batch5b
+        if regulation_settings := await self._read_holding(1030, 6):
+            data["regulation_settings"] = regulation_settings
 
-        # Batch 6a: Regulation settings (holding registers 1030-1035)
-        batch6a = self.read_holding_registers(1030, 6)
-        if batch6a:
-            data["regulation_settings"] = batch6a
+        if boiler_settings := await self._read_holding(1050, 13):
+            data["boiler_settings"] = boiler_settings
 
-        # Batch 6b: Regulation setting (holding register 1040)
-        batch6b = self.read_holding_registers(1040, 1)
-        if batch6b:
-            # Append to regulation_settings if it exists
-            if "regulation_settings" in data:
-                data["regulation_settings"].extend([0, 0, 0, 0])  # Fill gaps 1036-1039
-                data["regulation_settings"].extend(batch6b)  # Add 1040
-            else:
-                data["regulation_settings"] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] + batch6b
+        if ch1_settings := await self._read_holding(1200, 20):
+            data["ch1_settings"] = ch1_settings
 
-        # Batch 7: Boiler settings (holding registers 1050-1062)
-        batch7 = self.read_holding_registers(1050, 13)
-        if batch7:
-            data["boiler_settings"] = batch7
+        if data.get("ch2_available") and (
+            ch2_settings := await self._read_holding(1300, 20)
+        ):
+            data["ch2_settings"] = ch2_settings
 
-        # Batch 9: CH1 settings (holding registers 1200-1219)
-        batch9 = self.read_holding_registers(1200, 20)
-        if batch9:
-            data["ch1_settings"] = batch9
-
-        # Batch 10: CH2 settings (holding registers 1300-1319)
-        # Only read if CH2 is available
-        if data.get("ch2_available", False):
-            batch10 = self.read_holding_registers(1300, 20)
-            if batch10:
-                data["ch2_settings"] = batch10
-
-        # Batch 11: System control registers (holding registers 3001-3010)
-        # Already authenticated at the beginning
-        batch11 = self.read_holding_registers(3001, 10)
-        if batch11:
-            data["system_control"] = batch11
+        if system_control := await self._read_holding(3001, 10):
+            data["system_control"] = system_control
 
         return data
-
-    # ------------------------------------------------------------------
-    # Delegated scaling helpers (thin wrappers for backward compat)
-    # The real implementations live in scaling.py for easy testing.
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def registers_to_ip(reg0: int, reg1: int) -> str:
-        """Convert two registers to IP address."""
-        return _registers_to_ip(reg0, reg1)
-
-    @staticmethod
-    def ip_to_registers(ip: str) -> tuple[int, int]:
-        """Convert IP address to two registers."""
-        return _ip_to_registers(ip)
-
-    @staticmethod
-    def registers_to_mac(reg0: int, reg1: int, reg2: int) -> str:
-        """Convert three registers to MAC address."""
-        return _registers_to_mac(reg0, reg1, reg2)
-
-    @staticmethod
-    def registers_to_uint32(reg0: int, reg1: int) -> int:
-        """Convert two registers to 32-bit unsigned integer."""
-        return _registers_to_uint32(reg0, reg1)
-
-    @staticmethod
-    def scale_temperature(value: int) -> float:
-        """Scale temperature value (0.1 C resolution)."""
-        return _scale_temperature(value)
-
-    @staticmethod
-    def scale_signed_temperature(value: int) -> float:
-        """Scale signed temperature value (0.1 C resolution)."""
-        return _scale_signed_temperature(value)
-
-    @staticmethod
-    def scale_voltage(value: int) -> float:
-        """Scale voltage value (0.1V resolution)."""
-        return _scale_voltage(value)
-
-    @staticmethod
-    def scale_pressure(value: int) -> float:
-        """Scale pressure value (0.1 bar resolution)."""
-        return _scale_pressure(value)
-
-    @staticmethod
-    def scale_percentage(value: int) -> float:
-        """Scale percentage value (0.1% resolution)."""
-        return _scale_percentage(value)
-
-    @staticmethod
-    def scale_signed_percentage(value: int) -> float:
-        """Scale signed percentage value (0.1% resolution)."""
-        return _scale_signed_percentage(value)
-
-    @staticmethod
-    def scale_ratio(value: int) -> float:
-        """Scale ratio value (0.1 resolution)."""
-        return _scale_ratio(value)
-
-    @staticmethod
-    def unscale_temperature(value: float) -> int:
-        """Unscale temperature value for writing."""
-        return _unscale_temperature(value)
-
-    @staticmethod
-    def unscale_signed_temperature(value: float) -> int:
-        """Unscale signed temperature value for writing."""
-        return _unscale_signed_temperature(value)
-
-    @staticmethod
-    def unscale_voltage(value: float) -> int:
-        """Unscale voltage value for writing."""
-        return _unscale_voltage(value)
-
-    @staticmethod
-    def unscale_pressure(value: float) -> int:
-        """Unscale pressure value for writing."""
-        return _unscale_pressure(value)
-
-    @staticmethod
-    def unscale_percentage(value: float) -> int:
-        """Unscale percentage value for writing."""
-        return _unscale_percentage(value)
-
-    @staticmethod
-    def unscale_ratio(value: float) -> int:
-        """Unscale ratio value for writing."""
-        return _unscale_ratio(value)
