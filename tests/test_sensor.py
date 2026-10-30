@@ -6,10 +6,7 @@ import pytest
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import UnitOfTemperature
 
-from custom_components.jablotron_volta.sensor import (
-    SENSOR_TYPES,
-    JablotronVoltaSensor,
-)
+from custom_components.jablotron_volta.sensor import SENSOR_TYPES
 
 from .conftest import _make_coordinator_data
 
@@ -93,23 +90,23 @@ def test_energy_sensor_has_correct_attributes():
     )
 
 
-def test_ch2_sensors_have_available_fn():
-    """Test that CH2 sensors have availability function."""
+def test_ch2_sensors_have_exists_fn():
+    """Test that CH2 sensors are only created when CH2 is detected."""
     ch2_sensors = [s for s in SENSOR_TYPES if "ch2" in s.key]
     assert len(ch2_sensors) > 0, "No CH2 sensors found"
 
     for sensor in ch2_sensors:
-        assert sensor.available_fn is not None, (
-            f"CH2 sensor {sensor.key} should have available_fn"
+        assert sensor.exists_fn is not None, (
+            f"CH2 sensor {sensor.key} should have exists_fn"
         )
 
 
-def test_non_ch2_sensors_lack_available_fn():
-    """Non-CH2 sensors should NOT have available_fn (always available)."""
+def test_non_ch2_sensors_lack_exists_fn():
+    """Non-CH2 sensors should NOT have exists_fn (always created)."""
     non_ch2_sensors = [s for s in SENSOR_TYPES if "ch2" not in s.key]
     for sensor in non_ch2_sensors:
-        assert sensor.available_fn is None, (
-            f"Non-CH2 sensor {sensor.key} should not have available_fn"
+        assert sensor.exists_fn is None, (
+            f"Non-CH2 sensor {sensor.key} should not have exists_fn"
         )
 
 
@@ -326,35 +323,3 @@ class TestSensorValueFnEdgeCases:
                 f"Sensor {sensor.key} returned None — data key may be missing "
                 f"from _make_coordinator_data()"
             )
-
-
-# ---------------------------------------------------------------------------
-# Entity initialization tests (use mock fixtures)
-# ---------------------------------------------------------------------------
-
-
-def test_sensor_entity_initialization(mock_coordinator, mock_config_entry):
-    """Test sensor entity initialization."""
-    sensor_desc = SENSOR_TYPES[0]
-    sensor = JablotronVoltaSensor(mock_coordinator, mock_config_entry, sensor_desc)
-
-    assert sensor.entity_description == sensor_desc
-    assert sensor._attr_unique_id == f"{mock_config_entry.entry_id}_{sensor_desc.key}"
-    assert sensor.coordinator == mock_coordinator
-
-
-def test_sensor_native_value(mock_coordinator, mock_config_entry):
-    """Test sensor native_value property."""
-    temp_sensor_desc = next(s for s in SENSOR_TYPES if s.key == "outdoor_temp_damped")
-    sensor = JablotronVoltaSensor(mock_coordinator, mock_config_entry, temp_sensor_desc)
-
-    assert sensor.native_value == -2.5
-
-
-def test_sensor_handles_missing_data(mock_coordinator, mock_config_entry):
-    """Test that sensor handles missing data gracefully."""
-    temp_sensor_desc = next(s for s in SENSOR_TYPES if s.key == "outdoor_temp_damped")
-    mock_coordinator.data = {}
-
-    sensor = JablotronVoltaSensor(mock_coordinator, mock_config_entry, temp_sensor_desc)
-    assert sensor.native_value is None

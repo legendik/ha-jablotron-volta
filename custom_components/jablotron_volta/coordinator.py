@@ -8,6 +8,11 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import (
+    CONNECTION_NETWORK_MAC,
+    DeviceInfo,
+    format_mac,
+)
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -17,7 +22,7 @@ from .const import (
     MODEL,
     UPDATE_INTERVAL,
 )
-from .modbus_client import JablotronModbusClient
+from .modbus_client import JablotronModbusClient, JablotronVoltaError
 from .scaling import (
     registers_to_ip,
     registers_to_mac,
@@ -278,14 +283,18 @@ def process_raw_data(raw_data: dict[str, Any]) -> dict[str, Any]:
 # Coordinator class
 # ---------------------------------------------------------------------------
 
+type JablotronVoltaConfigEntry = ConfigEntry[JablotronVoltaCoordinator]
 
-class JablotronVoltaCoordinator(DataUpdateCoordinator):
+
+class JablotronVoltaCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Class to manage fetching Jablotron Volta data."""
+
+    config_entry: JablotronVoltaConfigEntry
 
     def __init__(
         self,
         hass: HomeAssistant,
-        entry: ConfigEntry,
+        entry: JablotronVoltaConfigEntry,
         client: JablotronModbusClient | None = None,
     ) -> None:
         """Initialize.
@@ -295,40 +304,44 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
             entry: Config entry.
             client: Optional pre-built Modbus client (for testing / DI).
         """
-        self.entry = entry
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=entry,
+            name=DOMAIN,
+            update_interval=UPDATE_INTERVAL,
+        )
         self.client = client or JablotronModbusClient(
             entry.data[CONF_HOST],
             entry.data[CONF_PORT],
             entry.data[CONF_DEVICE_ID],
         )
 
-        # Store device information for entity registration
-        self._serial_number: str | None = None
-        self._firmware_version: str | None = None
-        self._hardware_version: str | None = None
-        self._mac_address: str | None = None
+        # Device metadata, filled from the device-info registers on each poll
+        self.serial_number: str | None = None
+        self.firmware_version: str | None = None
+        self.hardware_version: str | None = None
+        self.mac_address: str | None = None
         self._ch2_available: bool = False
 
-        super().__init__(
-            hass,
-            _LOGGER,
-            name=DOMAIN,
-            update_interval=UPDATE_INTERVAL,
-        )
-
     @property
-    def device_info(self) -> dict[str, Any]:
+    def device_info(self) -> DeviceInfo:
         """Return device information."""
-        return {
-            "identifiers": {(DOMAIN, self.entry.entry_id)},
-            "name": f"{MANUFACTURER} {MODEL}",
-            "manufacturer": MANUFACTURER,
-            "model": MODEL,
-            "sw_version": self._firmware_version,
-            "hw_version": self._hardware_version,
-            "serial_number": self._serial_number,
-            "configuration_url": f"http://{self.entry.data[CONF_HOST]}",
-        }
+        info = DeviceInfo(
+            identifiers={(DOMAIN, self.config_entry.entry_id)},
+            name=f"{MANUFACTURER} {MODEL}",
+            manufacturer=MANUFACTURER,
+            model=MODEL,
+            sw_version=self.firmware_version,
+            hw_version=self.hardware_version,
+            serial_number=self.serial_number,
+            configuration_url=f"http://{self.config_entry.data[CONF_HOST]}",
+        )
+        if self.mac_address:
+            info["connections"] = {
+                (CONNECTION_NETWORK_MAC, format_mac(self.mac_address))
+            }
+        return info
 
     @property
     def ch2_available(self) -> bool:
@@ -338,37 +351,33 @@ class JablotronVoltaCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from device."""
         try:
-            return await self.hass.async_add_executor_job(self._fetch_data)
-        except Exception as err:
-            raise UpdateFailed(f"Error communicating with device: {err}") from err
+            raw_data = await self.client.async_read_all_data()
+        except JablotronVoltaError as err:
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="update_failed",
+                translation_placeholders={"error": str(err)},
+            ) from err
 
-    def _fetch_data(self) -> dict[str, Any]:
-        """Fetch data from Modbus device (runs in executor)."""
-        if not self.client.connect():
-            raise UpdateFailed("Cannot connect to device")
+        if not raw_data:
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="no_data",
+            )
 
-        try:
-            # Read all data using batched operations
-            raw_data = self.client.read_all_data()
+        processed_data = process_raw_data(raw_data)
 
-            if not raw_data:
-                raise UpdateFailed("No data received from device")
+        if device_meta := processed_data.pop("_device_meta", {}):
+            self.serial_number = device_meta.get("serial_number")
+            self.firmware_version = device_meta.get("firmware_version")
+            self.hardware_version = device_meta.get("hardware_version")
+            self.mac_address = device_meta.get("mac_address")
 
-            # Process and structure the data (pure function)
-            processed_data = process_raw_data(raw_data)
+        self._ch2_available = raw_data.get("ch2_available", False)
 
-            # Extract device metadata (side effect: updates coordinator state)
-            device_meta = processed_data.pop("_device_meta", {})
-            if device_meta:
-                self._serial_number = device_meta.get("serial_number")
-                self._firmware_version = device_meta.get("firmware_version")
-                self._hardware_version = device_meta.get("hardware_version")
-                self._mac_address = device_meta.get("mac_address")
+        return processed_data
 
-            # Update CH2 availability flag
-            self._ch2_available = raw_data.get("ch2_available", False)
-
-            return processed_data
-
-        finally:
-            self.client.close()
+    async def async_shutdown(self) -> None:
+        """Stop polling and close the device connection."""
+        await super().async_shutdown()
+        await self.client.async_close()

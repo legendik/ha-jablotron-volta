@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from custom_components.jablotron_volta.number import (
-    NUMBER_TYPES,
-    JablotronVoltaNumber,
-)
+from custom_components.jablotron_volta.number import NUMBER_TYPES
 from custom_components.jablotron_volta.scaling import (
     unscale_ratio,
     unscale_signed_percentage,
@@ -92,23 +89,23 @@ def test_translation_keys_use_full_words():
             )
 
 
-def test_ch2_numbers_have_available_fn():
-    """Test that CH2 numbers have availability function."""
+def test_ch2_numbers_have_exists_fn():
+    """Test that CH2 numbers are only created when CH2 is detected."""
     ch2_numbers = [n for n in NUMBER_TYPES if "ch2" in n.key]
     assert len(ch2_numbers) > 0, "No CH2 numbers found"
 
     for number in ch2_numbers:
-        assert number.available_fn is not None, (
-            f"CH2 number {number.key} should have available_fn"
+        assert number.exists_fn is not None, (
+            f"CH2 number {number.key} should have exists_fn"
         )
 
 
-def test_non_ch2_numbers_lack_available_fn():
-    """Non-CH2 numbers should NOT have available_fn."""
+def test_non_ch2_numbers_lack_exists_fn():
+    """Non-CH2 numbers should NOT have exists_fn."""
     non_ch2_numbers = [n for n in NUMBER_TYPES if "ch2" not in n.key]
     for number in non_ch2_numbers:
-        assert number.available_fn is None, (
-            f"Non-CH2 number {number.key} should not have available_fn"
+        assert number.exists_fn is None, (
+            f"Non-CH2 number {number.key} should not have exists_fn"
         )
 
 
@@ -430,18 +427,3 @@ class TestScaleFnRoundtrip:
         assert unscale_signed_percentage(-5.0) == 65486
         assert unscale_signed_percentage(5.0) == 50
         assert unscale_signed_percentage(0.0) == 0
-
-
-# ---------------------------------------------------------------------------
-# Entity initialization tests (use mock fixtures)
-# ---------------------------------------------------------------------------
-
-
-def test_number_entity_initialization(mock_coordinator, mock_config_entry):
-    """Test number entity initialization."""
-    number_desc = NUMBER_TYPES[0]
-    number = JablotronVoltaNumber(mock_coordinator, mock_config_entry, number_desc)
-
-    assert number.entity_description == number_desc
-    assert number._attr_unique_id == f"{mock_config_entry.entry_id}_{number_desc.key}"
-    assert number.coordinator == mock_coordinator

@@ -8,14 +8,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import (
     CONTROL_MODE_MAP,
-    DOMAIN,
     MASTER_FAIL_MAP,
     OUT_TEMP_SOURCE_MAP,
     REG_CH1_REGULATION_STRAT,
@@ -27,19 +25,22 @@ from .const import (
     REGU_MODE_MAP,
     REGULATION_STRAT_MAP,
 )
-from .coordinator import JablotronVoltaCoordinator
+from .coordinator import JablotronVoltaConfigEntry, JablotronVoltaCoordinator
+from .entity import JablotronVoltaEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
 
-@dataclass(frozen=True)
+
+@dataclass(frozen=True, kw_only=True)
 class JablotronVoltaSelectEntityDescription(SelectEntityDescription):
     """Describes Jablotron Volta select entity."""
 
-    value_fn: Callable[[dict[str, Any]], int | None] | None = None
-    options_map: dict[int, str] | None = None
-    register: int | None = None
-    available_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
+    value_fn: Callable[[dict[str, Any]], int | None]
+    options_map: dict[int, str]
+    register: int
+    exists_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
 
 
 SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
@@ -53,6 +54,7 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="outdoor_temp_source",
         translation_key="outdoor_temperature_source",
+        entity_category=EntityCategory.CONFIG,
         options_map=OUT_TEMP_SOURCE_MAP,
         register=REG_REGU_SOURCE_OUT_TEMPER,
         value_fn=lambda data: data.get("outdoor_temp_source"),
@@ -60,6 +62,7 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="ch1_regulation_strategy",
         translation_key="ch1_regulation_strategy",
+        entity_category=EntityCategory.CONFIG,
         options_map=REGULATION_STRAT_MAP,
         register=REG_CH1_REGULATION_STRAT,
         value_fn=lambda data: data.get("ch1_regulation_strategy"),
@@ -67,14 +70,16 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="ch2_regulation_strategy",
         translation_key="ch2_regulation_strategy",
+        entity_category=EntityCategory.CONFIG,
         options_map=REGULATION_STRAT_MAP,
         register=REG_CH2_REGULATION_STRAT,
         value_fn=lambda data: data.get("ch2_regulation_strategy"),
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=lambda coord: coord.ch2_available,
     ),
     JablotronVoltaSelectEntityDescription(
         key="control_mode",
         translation_key="control_mode",
+        entity_category=EntityCategory.CONFIG,
         options_map=CONTROL_MODE_MAP,
         register=REG_SYS_CONTROL,
         value_fn=lambda data: data.get("control_mode"),
@@ -82,6 +87,7 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
     JablotronVoltaSelectEntityDescription(
         key="master_fail_mode",
         translation_key="master_fail_mode",
+        entity_category=EntityCategory.CONFIG,
         options_map=MASTER_FAIL_MAP,
         register=REG_SYS_MASTER_FAIL,
         value_fn=lambda data: data.get("master_fail_mode"),
@@ -91,82 +97,47 @@ SELECT_TYPES: tuple[JablotronVoltaSelectEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: JablotronVoltaConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up Jablotron Volta select entities."""
-    coordinator: JablotronVoltaCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities: list[SelectEntity] = []
-
-    for description in SELECT_TYPES:
-        if description.available_fn and not description.available_fn(coordinator):
-            continue
-
-        entities.append(JablotronVoltaSelect(coordinator, entry, description))
-
-    async_add_entities(entities)
+    coordinator = entry.runtime_data
+    async_add_entities(
+        JablotronVoltaSelect(coordinator, description)
+        for description in SELECT_TYPES
+        if description.exists_fn is None or description.exists_fn(coordinator)
+    )
 
 
-class JablotronVoltaSelect(CoordinatorEntity, SelectEntity):
+class JablotronVoltaSelect(JablotronVoltaEntity, SelectEntity):
     """Representation of a Jablotron Volta select entity."""
 
     entity_description: JablotronVoltaSelectEntityDescription
-    _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
         description: JablotronVoltaSelectEntityDescription,
     ) -> None:
         """Initialize the select entity."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, description.key)
         self.entity_description = description
-        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_device_info = coordinator.device_info
-
-        # Set options from the map
-        if description.options_map:
-            self._attr_options = list(description.options_map.values())
+        self._attr_options = list(description.options_map.values())
+        self._option_to_value = {
+            option: value for value, option in description.options_map.items()
+        }
 
     @property
     def current_option(self) -> str | None:
         """Return the selected option."""
-        if self.entity_description.value_fn and self.entity_description.options_map:
-            value = self.entity_description.value_fn(self.coordinator.data)
-            if value is not None:
-                return self.entity_description.options_map.get(value)
-        return None
+        value = self.entity_description.value_fn(self.coordinator.data)
+        if value is None:
+            return None
+        return self.entity_description.options_map.get(value)
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        if (
-            not self.entity_description.options_map
-            or not self.entity_description.register
-        ):
-            return
-
-        # Find the value for the selected option
-        value = None
-        for key, val in self.entity_description.options_map.items():
-            if val == option:
-                value = key
-                break
-
-        if value is None:
-            _LOGGER.error(
-                "Invalid option %s for %s", option, self.entity_description.key
-            )
-            return
-
-        success = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            self.entity_description.register,
-            value,
+        # SelectEntity validates the option against self.options before calling
+        await self._async_write_register(
+            self.entity_description.register, self._option_to_value[option]
         )
-
-        if success:
-            await self.coordinator.async_request_refresh()
-        else:
-            _LOGGER.error("Failed to set %s to %s", self.entity_description.key, option)

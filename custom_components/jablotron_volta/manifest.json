@@ -9,8 +9,11 @@
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/legendik/ha-jablotron-volta/issues",
+  "loggers": [
+    "pymodbus"
+  ],
   "requirements": [
-    "pymodbus>=3.6,<4"
+    "pymodbus>=3.13,<4"
   ],
   "version": "1.3.2"
 }

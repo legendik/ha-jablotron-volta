@@ -8,16 +8,37 @@
           "host": "IP Address",
           "port": "Port",
           "device_id": "Device ID (Modbus Slave ID)"
+        },
+        "data_description": {
+          "host": "Hostname or IP address of the Volta boiler.",
+          "port": "Modbus TCP port of the boiler (default 502).",
+          "device_id": "Modbus unit ID configured on the boiler (default 1)."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Jablotron Volta",
+        "description": "Update the connection details for your Jablotron Volta device",
+        "data": {
+          "host": "IP Address",
+          "port": "Port",
+          "device_id": "Device ID (Modbus Slave ID)"
+        },
+        "data_description": {
+          "host": "Hostname or IP address of the Volta boiler.",
+          "port": "Modbus TCP port of the boiler (default 502).",
+          "device_id": "Modbus unit ID configured on the boiler (default 1)."
         }
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to the device",
-      "cannot_read": "Connected but failed to read data from the device",
-      "unknown": "Unexpected error occurred"
+      "cannot_connect": "Failed to connect to the device. Check IP address and port.",
+      "cannot_read": "Connected but failed to read data from the device. Check the device ID (slave ID) and ensure Modbus TCP is enabled on the device.",
+      "unknown": "Unexpected error occurred. See logs for details."
     },
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Device is already configured",
+      "reconfigure_successful": "Re-configuration was successful",
+      "wrong_device": "The device at this address is a different Volta unit (serial number does not match)."
     }
   },
   "entity": {
@@ -118,22 +139,63 @@
     },
     "select": {
       "ch1_regulation_strategy": {
-        "name": "CH1 Regulation Strategy"
+        "name": "CH1 Regulation Strategy",
+        "state": {
+          "direct_setpoint": "Direct setpoint",
+          "constant_water_temp": "Constant water temperature",
+          "equitherm_with_room": "Equitherm with room influence",
+          "room_pid": "Room PID",
+          "floor_drying_1": "Floor drying 1",
+          "floor_drying_2": "Floor drying 2",
+          "floor_drying_3": "Floor drying 3",
+          "analog_0_10v": "Analog 0-10 V"
+        }
       },
       "ch2_regulation_strategy": {
-        "name": "CH2 Regulation Strategy"
+        "name": "CH2 Regulation Strategy",
+        "state": {
+          "direct_setpoint": "Direct setpoint",
+          "constant_water_temp": "Constant water temperature",
+          "equitherm_with_room": "Equitherm with room influence",
+          "room_pid": "Room PID",
+          "floor_drying_1": "Floor drying 1",
+          "floor_drying_2": "Floor drying 2",
+          "floor_drying_3": "Floor drying 3",
+          "analog_0_10v": "Analog 0-10 V"
+        }
       },
       "control_mode": {
-        "name": "Control Mode"
+        "name": "Control Mode",
+        "state": {
+          "monitoring": "Monitoring only",
+          "full_control": "Full control",
+          "power_control": "Power control"
+        }
       },
       "master_fail_mode": {
-        "name": "Master Fail Mode"
+        "name": "Master Fail Mode",
+        "state": {
+          "standby": "Standby",
+          "no_action": "No action"
+        }
       },
       "outdoor_temperature_source": {
-        "name": "Outdoor Temperature Source"
+        "name": "Outdoor Temperature Source",
+        "state": {
+          "none": "None",
+          "boiler": "Boiler sensor",
+          "cloud": "Cloud",
+          "iomodule": "I/O module"
+        }
       },
       "regulation_mode": {
-        "name": "Regulation Mode"
+        "name": "Regulation Mode",
+        "state": {
+          "standby": "Standby",
+          "auto": "Auto",
+          "summer": "Summer",
+          "winter": "Winter"
+        }
       }
     },
     "number": {
@@ -265,6 +327,17 @@
       "ch2": {
         "name": "Heating Circuit 2"
       }
+    }
+  },
+  "exceptions": {
+    "update_failed": {
+      "message": "Error communicating with the device: {error}"
+    },
+    "no_data": {
+      "message": "The device returned no data"
+    },
+    "write_failed": {
+      "message": "Failed to update {entity_id}: {error}"
     }
   }
 }

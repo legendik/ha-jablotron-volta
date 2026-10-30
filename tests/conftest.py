@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock
+from collections.abc import Generator
+from typing import Any
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.jablotron_volta.const import (
     CONF_DEVICE_ID,
@@ -15,33 +18,85 @@ from custom_components.jablotron_volta.const import (
     DOMAIN,
 )
 
-
-@pytest.fixture
-def mock_modbus_client():
-    """Mock Modbus client."""
-    from custom_components.jablotron_volta.modbus_client import JablotronModbusClient
-
-    client = MagicMock(spec=JablotronModbusClient)
-    client.connect = MagicMock(return_value=True)
-    client.close = MagicMock()
-    client.read_input_registers = MagicMock(return_value=[0] * 100)
-    client.read_holding_registers = MagicMock(return_value=[0] * 100)
-    client.write_register = MagicMock(return_value=True)
-    return client
+HOST = "192.168.1.100"
+SERIAL = "123456"
+ENTRY_DATA = {
+    CONF_HOST: HOST,
+    CONF_PORT: DEFAULT_PORT,
+    CONF_DEVICE_ID: DEFAULT_DEVICE_ID,
+}
 
 
-@pytest.fixture
-def mock_config_entry():
-    """Mock config entry."""
-    entry = MagicMock()
-    entry.entry_id = "test_entry_id"
-    entry.data = {
-        CONF_HOST: "192.168.1.100",
-        CONF_PORT: DEFAULT_PORT,
-        CONF_DEVICE_ID: DEFAULT_DEVICE_ID,
+@pytest.fixture(autouse=True)
+def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
+    """Allow loading the custom integration in every test."""
+
+
+def make_raw_data(*, ch2: bool = False) -> dict[str, Any]:
+    """Build raw register batches as returned by async_read_all_data()."""
+    ch1_status = [1, 215, 400, 350, 300, 550, 4500]
+    ch1_settings = [1, 220, 150, 280, 220, 80, 10, 3, 250, 550]
+    ch1_settings += [400, 15, 65516, 50, 450, 30, 1, 0, 65531, 0]
+    raw: dict[str, Any] = {
+        # serial 1 << 16 | 57920 == 123456
+        "device_info": [1, 57920, 0, 0, 0x0102, 3, 0xAABB, 0xCCDD, 0xEEFF, 0x0203, 4],
+        "network_info": [0xC0A8, 0x0164, 0xFFFF, 0xFF00, 0xC0A8, 0x0101],
+        "system_status": [455, 33],
+        "regulation": [2, 65511, 65518],
+        "boiler_status": [3, 0, 15, 0, 550, 450, 800, 1000, 0, 0],
+        "ch1_status": ch1_status,
+        "system_alerts": [0, 0],
+        "regulation_settings": [2, 1, 48, 5, 50, 65486],
+        "boiler_settings": [0, 1, 0, 1234, 600, 800, 300, 0, 0, 0, 0, 0, 0],
+        "ch1_settings": ch1_settings,
+        "system_control": [0, 1, 0, 0, 0, 0, 60, 0, 0, 3],
+        "ch2_available": ch2,
     }
-    entry.title = "Jablotron Volta"
-    return entry
+    if ch2:
+        raw["ch2_status"] = list(ch1_status)
+        raw["ch2_settings"] = list(ch1_settings)
+    return raw
+
+
+@pytest.fixture
+def mock_client() -> Generator[AsyncMock]:
+    """Patch the Modbus client used by the coordinator and the config flow."""
+    with (
+        patch(
+            "custom_components.jablotron_volta.coordinator.JablotronModbusClient",
+            autospec=True,
+        ) as client_class,
+        patch(
+            "custom_components.jablotron_volta.config_flow.JablotronModbusClient",
+            new=client_class,
+        ),
+    ):
+        client = client_class.return_value
+        client.async_read_all_data.return_value = make_raw_data()
+        client.async_read_serial_number.return_value = SERIAL
+        yield client
+
+
+@pytest.fixture
+def mock_config_entry() -> MockConfigEntry:
+    """Config entry for a Volta at HOST."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=f"Jablotron Volta ({HOST})",
+        data=dict(ENTRY_DATA),
+        unique_id=SERIAL,
+    )
+
+
+@pytest.fixture
+async def init_integration(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry, mock_client: AsyncMock
+) -> MockConfigEntry:
+    """Set up the integration with the mocked client."""
+    mock_config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+    return mock_config_entry
 
 
 def _make_coordinator_data() -> dict:
@@ -124,30 +179,3 @@ def _make_coordinator_data() -> dict:
         "master_timeout": 60,
         "circuit_mask": 3,
     }
-
-
-@pytest.fixture
-def mock_coordinator(mock_modbus_client):
-    """Mock coordinator with realistic data."""
-    from custom_components.jablotron_volta.coordinator import (
-        JablotronVoltaCoordinator,
-    )
-
-    coordinator = MagicMock(spec=JablotronVoltaCoordinator)
-    coordinator.data = _make_coordinator_data()
-    coordinator.ch2_available = False
-    coordinator.async_request_refresh = AsyncMock()
-    coordinator.client = mock_modbus_client
-    coordinator.device_info = {
-        "identifiers": {(DOMAIN, "test_entry_id")},
-        "name": "Jablotron Volta",
-        "manufacturer": "Jablotron",
-        "model": "Volta",
-    }
-    return coordinator
-
-
-@pytest.fixture
-def hass():
-    """Mock Home Assistant instance."""
-    return MagicMock(spec=HomeAssistant)

@@ -13,32 +13,66 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
+    EntityCategory,
     UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfPressure,
+    UnitOfRatio,
     UnitOfTemperature,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
-from .coordinator import JablotronVoltaCoordinator
+from .coordinator import JablotronVoltaConfigEntry, JablotronVoltaCoordinator
+from .entity import JablotronVoltaEntity
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
 
-@dataclass(frozen=True)
+
+@dataclass(frozen=True, kw_only=True)
 class JablotronVoltaSensorEntityDescription(SensorEntityDescription):
     """Describes Jablotron Volta sensor entity."""
 
-    value_fn: Callable[[dict[str, Any]], StateType] | None = None
-    available_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
+    value_fn: Callable[[dict[str, Any]], StateType]
+    exists_fn: Callable[[JablotronVoltaCoordinator], bool] | None = None
+
+
+def _temperature(
+    key: str, translation_key: str, **kwargs: Any
+) -> JablotronVoltaSensorEntityDescription:
+    """Describe a Celsius temperature sensor reading data[key]."""
+    return JablotronVoltaSensorEntityDescription(
+        key=key,
+        translation_key=translation_key,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+        value_fn=lambda data: data.get(key),
+        **kwargs,
+    )
+
+
+def _percentage(key: str, **kwargs: Any) -> JablotronVoltaSensorEntityDescription:
+    """Describe a percentage sensor reading data[key]."""
+    return JablotronVoltaSensorEntityDescription(
+        key=key,
+        translation_key=key,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        suggested_display_precision=0,
+        value_fn=lambda data: data.get(key),
+        **kwargs,
+    )
+
+
+def _ch2_available(coordinator: JablotronVoltaCoordinator) -> bool:
+    return coordinator.ch2_available
 
 
 SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
@@ -52,127 +86,37 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         value_fn=lambda data: data.get("boiler_total_energy"),
     ),
     # System Temperatures
-    JablotronVoltaSensorEntityDescription(
-        key="cpu_temperature",
-        translation_key="cpu_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("cpu_temperature"),
+    _temperature(
+        "cpu_temperature",
+        "cpu_temperature",
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     # Outdoor Temperatures
-    JablotronVoltaSensorEntityDescription(
-        key="outdoor_temp_damped",
-        translation_key="outdoor_temperature_damped",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("outdoor_temp_damped"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="outdoor_temp_composite",
-        translation_key="outdoor_temperature_composite",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("outdoor_temp_composite"),
-    ),
+    _temperature("outdoor_temp_damped", "outdoor_temperature_damped"),
+    _temperature("outdoor_temp_composite", "outdoor_temperature_composite"),
     # Room Temperatures (from thermostats)
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_temperature_current",
-        translation_key="ch1_temperature_current",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch1_temperature_current"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_temperature_current",
-        translation_key="ch2_temperature_current",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch2_temperature_current"),
-        available_fn=lambda coord: coord.ch2_available,
+    _temperature("ch1_temperature_current", "ch1_temperature_current"),
+    _temperature(
+        "ch2_temperature_current", "ch2_temperature_current", exists_fn=_ch2_available
     ),
     # Boiler Water Temperatures
-    JablotronVoltaSensorEntityDescription(
-        key="boiler_water_input_temp",
-        translation_key="boiler_water_input_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("boiler_water_input_temp"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="boiler_water_return_temp",
-        translation_key="boiler_water_return_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("boiler_water_return_temp"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="boiler_water_setpoint",
-        translation_key="boiler_water_setpoint",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("boiler_water_setpoint"),
-    ),
+    _temperature("boiler_water_input_temp", "boiler_water_input_temperature"),
+    _temperature("boiler_water_return_temp", "boiler_water_return_temperature"),
+    _temperature("boiler_water_setpoint", "boiler_water_setpoint"),
     # CH1 Water Temperatures
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_water_input_temp",
-        translation_key="ch1_water_input_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch1_water_input_temp"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_water_return_temp",
-        translation_key="ch1_water_return_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch1_water_return_temp"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_water_setpoint",
-        translation_key="ch1_water_setpoint",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch1_water_setpoint"),
-    ),
+    _temperature("ch1_water_input_temp", "ch1_water_input_temperature"),
+    _temperature("ch1_water_return_temp", "ch1_water_return_temperature"),
+    _temperature("ch1_water_setpoint", "ch1_water_setpoint"),
     # CH2 Water Temperatures (conditional)
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_water_input_temp",
-        translation_key="ch2_water_input_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch2_water_input_temp"),
-        available_fn=lambda coord: coord.ch2_available,
+    _temperature(
+        "ch2_water_input_temp", "ch2_water_input_temperature", exists_fn=_ch2_available
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_water_return_temp",
-        translation_key="ch2_water_return_temperature",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch2_water_return_temp"),
-        available_fn=lambda coord: coord.ch2_available,
+    _temperature(
+        "ch2_water_return_temp",
+        "ch2_water_return_temperature",
+        exists_fn=_ch2_available,
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_water_setpoint",
-        translation_key="ch2_water_setpoint",
-        device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-        value_fn=lambda data: data.get("ch2_water_setpoint"),
-        available_fn=lambda coord: coord.ch2_available,
-    ),
+    _temperature("ch2_water_setpoint", "ch2_water_setpoint", exists_fn=_ch2_available),
     # System Status
     JablotronVoltaSensorEntityDescription(
         key="battery_voltage",
@@ -180,6 +124,8 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.VOLTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
+        suggested_display_precision=1,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data.get("battery_voltage"),
     ),
     # Boiler Status
@@ -189,27 +135,17 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfPressure.BAR,
+        suggested_display_precision=1,
         value_fn=lambda data: data.get("boiler_pressure"),
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="boiler_pump_power",
-        translation_key="boiler_pump_power",
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("boiler_pump_power"),
-    ),
-    JablotronVoltaSensorEntityDescription(
-        key="boiler_heating_power",
-        translation_key="boiler_heating_power",
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("boiler_heating_power"),
-    ),
+    _percentage("boiler_pump_power"),
+    _percentage("boiler_heating_power"),
     JablotronVoltaSensorEntityDescription(
         key="boiler_pwm_value",
         translation_key="boiler_pwm_value",
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data.get("boiler_pwm_value"),
     ),
     JablotronVoltaSensorEntityDescription(
@@ -223,70 +159,53 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
         value_fn=lambda data: data.get("boiler_inactive_segments"),
     ),
     # CH1 Environmental
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_humidity",
-        translation_key="ch1_humidity",
-        device_class=SensorDeviceClass.HUMIDITY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("ch1_humidity"),
-    ),
+    _percentage("ch1_humidity", device_class=SensorDeviceClass.HUMIDITY),
     JablotronVoltaSensorEntityDescription(
         key="ch1_co2",
         translation_key="ch1_co2",
         device_class=SensorDeviceClass.CO2,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
+        native_unit_of_measurement=UnitOfRatio.PARTS_PER_MILLION,
+        suggested_display_precision=0,
         value_fn=lambda data: data.get("ch1_co2"),
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch1_pump_power",
-        translation_key="ch1_pump_power",
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("ch1_pump_power"),
-    ),
+    _percentage("ch1_pump_power"),
     # CH2 Environmental (conditional)
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_humidity",
-        translation_key="ch2_humidity",
+    _percentage(
+        "ch2_humidity",
         device_class=SensorDeviceClass.HUMIDITY,
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("ch2_humidity"),
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=_ch2_available,
     ),
     JablotronVoltaSensorEntityDescription(
         key="ch2_co2",
         translation_key="ch2_co2",
         device_class=SensorDeviceClass.CO2,
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
+        native_unit_of_measurement=UnitOfRatio.PARTS_PER_MILLION,
+        suggested_display_precision=0,
         value_fn=lambda data: data.get("ch2_co2"),
-        available_fn=lambda coord: coord.ch2_available,
+        exists_fn=_ch2_available,
     ),
-    JablotronVoltaSensorEntityDescription(
-        key="ch2_pump_power",
-        translation_key="ch2_pump_power",
-        state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
-        value_fn=lambda data: data.get("ch2_pump_power"),
-        available_fn=lambda coord: coord.ch2_available,
-    ),
-    # Device Information
+    _percentage("ch2_pump_power", exists_fn=_ch2_available),
+    # Network Information
     JablotronVoltaSensorEntityDescription(
         key="ip_address",
         translation_key="ip_address",
+        entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda data: data.get("ip_address"),
     ),
     JablotronVoltaSensorEntityDescription(
         key="subnet_mask",
         translation_key="subnet_mask",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         value_fn=lambda data: data.get("subnet_mask"),
     ),
     JablotronVoltaSensorEntityDescription(
         key="gateway",
         translation_key="gateway",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         value_fn=lambda data: data.get("gateway"),
     ),
 )
@@ -294,45 +213,33 @@ SENSOR_TYPES: tuple[JablotronVoltaSensorEntityDescription, ...] = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: JablotronVoltaConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up Jablotron Volta sensors."""
-    coordinator: JablotronVoltaCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities: list[SensorEntity] = []
-
-    for description in SENSOR_TYPES:
-        # Check if entity should be created based on availability function
-        if description.available_fn and not description.available_fn(coordinator):
-            continue
-
-        entities.append(JablotronVoltaSensor(coordinator, entry, description))
-
-    async_add_entities(entities)
+    coordinator = entry.runtime_data
+    async_add_entities(
+        JablotronVoltaSensor(coordinator, description)
+        for description in SENSOR_TYPES
+        if description.exists_fn is None or description.exists_fn(coordinator)
+    )
 
 
-class JablotronVoltaSensor(CoordinatorEntity, SensorEntity):
+class JablotronVoltaSensor(JablotronVoltaEntity, SensorEntity):
     """Representation of a Jablotron Volta sensor."""
 
     entity_description: JablotronVoltaSensorEntityDescription
-    _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
         description: JablotronVoltaSensorEntityDescription,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator)
+        super().__init__(coordinator, description.key)
         self.entity_description = description
-        self._attr_unique_id = f"{entry.entry_id}_{description.key}"
-        self._attr_device_info = coordinator.device_info
 
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
-        if self.entity_description.value_fn:
-            return self.entity_description.value_fn(self.coordinator.data)
-        return None
+        return self.entity_description.value_fn(self.coordinator.data)

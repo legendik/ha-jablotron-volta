@@ -4,121 +4,97 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.components.button import (
+    ButtonDeviceClass,
+    ButtonEntity,
+    ButtonEntityDescription,
+)
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN, REG_SYS_ATTENTION_0, REG_SYS_ERROR_CODE, REG_SYS_RESET
-from .coordinator import JablotronVoltaCoordinator
+from .coordinator import JablotronVoltaConfigEntry, JablotronVoltaCoordinator
+from .entity import JablotronVoltaEntity
+from .modbus_client import JablotronVoltaError
 
 _LOGGER = logging.getLogger(__name__)
 
+PARALLEL_UPDATES = 0
 
+RESET_ERROR_BUTTON = ButtonEntityDescription(
+    key="reset_error",
+    translation_key="reset_error",
+    entity_category=EntityCategory.CONFIG,
+)
+RESTART_BUTTON = ButtonEntityDescription(
+    key="restart_device",
+    translation_key="restart_device",
+    device_class=ButtonDeviceClass.RESTART,
+    entity_category=EntityCategory.CONFIG,
+)
 BUTTON_TYPES: tuple[ButtonEntityDescription, ...] = (
-    ButtonEntityDescription(
-        key="reset_error",
-        translation_key="reset_error",
-    ),
-    ButtonEntityDescription(
-        key="restart_device",
-        translation_key="restart_device",
-    ),
+    RESET_ERROR_BUTTON,
+    RESTART_BUTTON,
 )
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: JablotronVoltaConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up Jablotron Volta button entities."""
-    coordinator: JablotronVoltaCoordinator = hass.data[DOMAIN][entry.entry_id]
-
-    entities: list[ButtonEntity] = [
-        JablotronVoltaResetErrorButton(coordinator, entry),
-        JablotronVoltaRestartButton(coordinator, entry),
-    ]
-
-    async_add_entities(entities)
-
-
-class JablotronVoltaButtonBase(CoordinatorEntity, ButtonEntity):
-    """Base class for Jablotron Volta buttons."""
-
-    _attr_has_entity_name = True
-
-    def __init__(
-        self,
-        coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
-        key: str,
-    ) -> None:
-        """Initialize the button."""
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{entry.entry_id}_{key}"
-        self._attr_translation_key = key
-        self._attr_device_info = coordinator.device_info
+    coordinator = entry.runtime_data
+    async_add_entities(
+        [
+            JablotronVoltaResetErrorButton(coordinator),
+            JablotronVoltaRestartButton(coordinator),
+        ]
+    )
 
 
-class JablotronVoltaResetErrorButton(JablotronVoltaButtonBase):
+class JablotronVoltaResetErrorButton(JablotronVoltaEntity, ButtonEntity):
     """Button to reset errors/attention notifications."""
 
-    def __init__(
-        self,
-        coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
-    ) -> None:
+    def __init__(self, coordinator: JablotronVoltaCoordinator) -> None:
         """Initialize the reset error button."""
-        super().__init__(coordinator, entry, "reset_error")
+        super().__init__(coordinator, RESET_ERROR_BUTTON.key)
+        self.entity_description = RESET_ERROR_BUTTON
 
     async def async_press(self) -> None:
-        """Handle the button press."""
-        # Write 0 to attention register to reset
-        success1 = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            REG_SYS_ATTENTION_0,
-            0,
-        )
+        """Clear the attention flags and the error code."""
+        errors: list[JablotronVoltaError] = []
+        for register in (REG_SYS_ATTENTION_0, REG_SYS_ERROR_CODE):
+            try:
+                await self.coordinator.client.async_write_register(register, 0)
+            except JablotronVoltaError as err:
+                _LOGGER.debug("Resetting register %s failed: %s", register, err)
+                errors.append(err)
 
-        # Also try to reset error code if system access is available
-        success2 = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            REG_SYS_ERROR_CODE,
-            0,
-        )
+        # The device may refuse one of the two resets; only fail if both do
+        if len(errors) == 2:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="write_failed",
+                translation_placeholders={
+                    "entity_id": self.entity_id,
+                    "error": str(errors[0]),
+                },
+            ) from errors[0]
 
-        if success1 or success2:
-            await self.coordinator.async_request_refresh()
-            _LOGGER.info("Error/attention reset triggered")
-        else:
-            _LOGGER.error("Failed to reset errors")
+        await self.coordinator.async_request_refresh()
 
 
-class JablotronVoltaRestartButton(JablotronVoltaButtonBase):
+class JablotronVoltaRestartButton(JablotronVoltaEntity, ButtonEntity):
     """Button to restart the device."""
 
-    def __init__(
-        self,
-        coordinator: JablotronVoltaCoordinator,
-        entry: ConfigEntry,
-    ) -> None:
+    def __init__(self, coordinator: JablotronVoltaCoordinator) -> None:
         """Initialize the restart button."""
-        super().__init__(coordinator, entry, "restart_device")
+        super().__init__(coordinator, RESTART_BUTTON.key)
+        self.entity_description = RESTART_BUTTON
 
     async def async_press(self) -> None:
-        """Handle the button press."""
-        # Write non-zero value to trigger restart
-        success = await self.hass.async_add_executor_job(
-            self.coordinator.client.write_register,
-            REG_SYS_RESET,
-            1,
-        )
-
-        if success:
-            _LOGGER.warning(
-                "Device restart triggered - device will be unavailable briefly"
-            )
-        else:
-            _LOGGER.error("Failed to restart device")
+        """Restart the device; it drops off the network briefly."""
+        await self._async_write_register(REG_SYS_RESET, 1, refresh=False)

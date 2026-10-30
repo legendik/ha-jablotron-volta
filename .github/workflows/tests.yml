@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14"
 
       - name: Install ruff
         run: pip install ruff
@@ -29,17 +29,32 @@ jobs:
         run: ruff format --check custom_components/jablotron_volta/ tests/
 
   test:
-    name: Pytest
+    name: Pytest (HA ${{ matrix.name }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Latest Home Assistant, pinned via requirements-dev.txt
+          - name: latest
+            python-version: "3.14"
+            install: pip install -r requirements-dev.txt
+          # Oldest supported Home Assistant (hacs.json "homeassistant")
+          - name: "2026.7.0"
+            python-version: "3.14"
+            install: >-
+              pip install
+              pytest-homeassistant-custom-component==0.13.344
+              pymodbus==3.13.1
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: pip install -r requirements-dev.txt
+        run: ${{ matrix.install }}
 
       - name: Run tests
         run: pytest -v
