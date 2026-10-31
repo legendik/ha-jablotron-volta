@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v2.0.0...jablotron-volta-v2.0.1) (2026-10-31)
+
+
+### Bug Fixes
+
+* **network:** decode IPv4 registers low word first ([#18](https://github.com/legendik/ha-jablotron-volta/issues/18)) ([00dffd3](https://github.com/legendik/ha-jablotron-volta/commit/00dffd3ac0275247e451106b63170ea82452bed6))
+
 ## [2.0.0](https://github.com/legendik/ha-jablotron-volta/compare/jablotron-volta-v1.3.2...jablotron-volta-v2.0.0) (2026-10-30)
 
 
