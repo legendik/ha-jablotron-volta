@@ -45,13 +45,23 @@ class TestParseNetworkInfo:
     """Test parse_network_info."""
 
     def test_normal(self):
-        # IP: 192.168.1.100 -> (192<<8|168, 1<<8|100) = (49320, 356)
-        # Mask: 255.255.255.0 -> (0xFFFF, 0xFF00)
-        # GW: 192.168.1.1 -> (49320, 257)
-        regs = [49320, 356, 0xFFFF, 0xFF00, 49320, 257]
+        # Volta sends each address low word first.
+        # IP: 192.168.1.100 -> (1<<8|100, 192<<8|168) = (356, 49320)
+        # Mask: 255.255.255.0 -> (0xFF00, 0xFFFF)
+        # GW: 192.168.1.1 -> (257, 49320)
+        regs = [356, 49320, 0xFF00, 0xFFFF, 257, 49320]
         result = parse_network_info(regs)
 
         assert result["ip_address"] == "192.168.1.100"
+        assert result["subnet_mask"] == "255.255.255.0"
+        assert result["gateway"] == "192.168.1.1"
+
+    def test_real_device_registers(self):
+        """Regression test: raw registers read from a Volta (fw 3.11.9231)."""
+        regs = [0x01D2, 0xC0A8, 0xFF00, 0xFFFF, 0x0101, 0xC0A8]
+        result = parse_network_info(regs)
+
+        assert result["ip_address"] == "192.168.1.210"
         assert result["subnet_mask"] == "255.255.255.0"
         assert result["gateway"] == "192.168.1.1"
 
@@ -301,7 +311,7 @@ class TestProcessRawData:
         """Test with a realistic full raw_data dict."""
         raw = {
             "device_info": [0, 1, 0, 0, 0x0100, 1, 0, 0, 0, 0x0100, 1],
-            "network_info": [49320, 356, 0xFFFF, 0xFF00, 49320, 257],
+            "network_info": [356, 49320, 0xFF00, 0xFFFF, 257, 49320],
             "system_status": [455, 33],
             "regulation": [2, 65511, 65518],
             "boiler_status": [3, 0, 15, 0, 550, 450, 800, 1000, 0, 50],

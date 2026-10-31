@@ -40,7 +40,8 @@ def make_raw_data(*, ch2: bool = False) -> dict[str, Any]:
     raw: dict[str, Any] = {
         # serial 1 << 16 | 57920 == 123456
         "device_info": [1, 57920, 0, 0, 0x0102, 3, 0xAABB, 0xCCDD, 0xEEFF, 0x0203, 4],
-        "network_info": [0xC0A8, 0x0164, 0xFFFF, 0xFF00, 0xC0A8, 0x0101],
+        # Volta reports IPv4 words low word first (192.168.1.100, 255.255.255.0, 192.168.1.1)
+        "network_info": [0x0164, 0xC0A8, 0xFF00, 0xFFFF, 0x0101, 0xC0A8],
         "system_status": [455, 33],
         "regulation": [2, 65511, 65518],
         "boiler_status": [3, 0, 15, 0, 550, 450, 800, 1000, 0, 0],
