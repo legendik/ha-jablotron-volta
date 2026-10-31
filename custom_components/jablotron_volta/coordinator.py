@@ -75,13 +75,18 @@ def parse_device_info(registers: list[int]) -> dict[str, Any]:
 
 
 def parse_network_info(registers: list[int]) -> dict[str, Any]:
-    """Parse network information registers (6 registers)."""
+    """Parse network information registers (6 registers).
+
+    Volta reports each IPv4 address low word first: for 192.168.1.210 the
+    device returns 0x01D2, 0xC0A8, i.e. the register pair is reversed
+    compared to the natural big-endian byte order.
+    """
     if len(registers) < 6:
         return {}
     return {
-        "ip_address": registers_to_ip(registers[0], registers[1]),
-        "subnet_mask": registers_to_ip(registers[2], registers[3]),
-        "gateway": registers_to_ip(registers[4], registers[5]),
+        "ip_address": registers_to_ip(registers[1], registers[0]),
+        "subnet_mask": registers_to_ip(registers[3], registers[2]),
+        "gateway": registers_to_ip(registers[5], registers[4]),
     }
 
 
